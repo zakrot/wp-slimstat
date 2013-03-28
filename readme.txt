@@ -1,6 +1,6 @@
 === WP SlimStat ===
 Contributors: coolmann
-Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_donations&business=Z732JS7KQ6RRL&lc=US&item_name=WP%20SlimStat&currency_code=USD&bn=PP%2dDonationsBF%3abtn_donate_SM%2egif%3aNonHosted
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BNJR5EZNY3W38
 Tags: chart, analytics, visitors, users, spy, shortstat, tracking, reports, seo, referers, analyze, wassup, geolocation, online users, spider, tracker, pageviews, world map, stats, maxmind, flot, stalker, statistics, google+, monitor, seo
 Requires at least: 3.1
 Tested up to: 3.5.1
@@ -8,6 +8,8 @@ Stable tag: 3.0
 
 == Description ==
 A powerful real-time web analytics plugin for Wordpress. Visit the [official site](http://slimstat.duechiacchiere.it) for more information.
+
+**Please note: WP SlimStat Dashboard Widgets is not part of this package anymore. If you notice any 'fatal error' related to that plugin, please [reinstall it](http://wordpress.org/extend/plugins/wp-slimstat-dashboard-widgets/) from the repository!**
 
 = Main Features =
 * Real-time web analytics reports
@@ -91,6 +93,30 @@ WP Touch has an advanced option that they call Restricted Mode, which attempts t
 Both Jetpack and GA use Javascript to track visitors. All the other pageviews are ignored, because search engines and other crawlers don't execute that client-side code.
 
 WP SlimStat, on the other side, has a server-based tracking engine, which can capture *all* of your visitors, both 'humans' and 'bots'. That's the main reason why you may see more (some times much more) traffic recorded by WP SlimStat. 
+
+= I noticed that the file `view.css` contains numerous base64 encoded strings, which I find kind of alarming. Is this normal? =
+I'm particularly serious when it comes to data integrity and safety, and I always try to put the best of my knowledge to make sure WP SlimStat is secure and doesn't carry any vulnerability.
+What you found in the CSS is a common technique used by experienced web developers to optimize site performances by 'embedding' small images (mainly icons)
+directly into the CSS, thus avoiding extra requests to the server to download all the media elements referenced by the page.
+You can get more information about this technique on [Wikipedia](http://en.wikipedia.org/wiki/Data_URI_scheme).
+
+= How can I change the colors associated to color-coded pageviews (known user, known visitors, search engines, etc)? =
+Go to Settings > SlimStat > View tab and paste your custom CSS into the corresponding field. Use the following code as a reference:
+
+`.postbox p.is-search-engine,
+.legend span.is-search-engine{background-color:#C1E751;color:#444}
+
+.postbox p.is-direct,
+.legend span.is-direct{background-color:#D0E0EB;color:#111}
+
+.postbox p.is-known-user,
+.legend span.is-known-user{background-color:#F1CF90}
+
+.postbox p.is-known-visitor,
+.legend span.is-known-visitor{background-color:#EFFD8C}
+
+.postbox p.is-spam,
+.legend span.is-spam{background-color:#AAB3AB;color:#222}`
 
 = Can I track clicks and other events happening on the page? =
 Yes, you can. This plugin includes a Javascript handler that can be attached to any event: click, mouseover, focus, keypress, etc. Here's the syntax:
@@ -256,82 +282,6 @@ Top Languages last month:
 $results = wp_slimstat_db::get_popular('t1.language');
 foreach ($results...`
 
-*Database description (see wp-slimstat-admin.php)*
-
-wp_slim_stats t1
-
-`id INT UNSIGNED NOT NULL auto_increment,
-ip INT UNSIGNED DEFAULT 0,
-other_ip INT UNSIGNED DEFAULT 0,
-user VARCHAR(255) DEFAULT '',
-language VARCHAR(5) DEFAULT '',
-country VARCHAR(2) DEFAULT '',
-domain VARCHAR(255) DEFAULT '',
-referer VARCHAR(2048) DEFAULT '',
-searchterms VARCHAR(2048) DEFAULT '',
-resource VARCHAR(2048) DEFAULT '',
-browser_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
-screenres_id MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
-content_info_id MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
-plugins VARCHAR(255) DEFAULT '',
-notes VARCHAR(512) DEFAULT '',
-visit_id INT UNSIGNED NOT NULL DEFAULT 0,
-dt INT(10) UNSIGNED DEFAULT 0,
-PRIMARY KEY id (id)`
-
-wp_slim_countries tc
-
-`ip_from INT UNSIGNED DEFAULT 0,
-ip_to INT UNSIGNED DEFAULT 0,
-country_code CHAR(2) DEFAULT '',
-CONSTRAINT ip_from_idx PRIMARY KEY (ip_from, ip_to)`
-
-wp_slim_browsers tb
-
-`browser_id SMALLINT UNSIGNED NOT NULL auto_increment,
-browser VARCHAR(40) DEFAULT '',
-version VARCHAR(15) DEFAULT '',
-platform VARCHAR(15) DEFAULT '',
-css_version VARCHAR(5) DEFAULT '',
-type TINYINT UNSIGNED DEFAULT 0,
-PRIMARY KEY (browser_id)`
-
-wp_slim_screenres tss
-
-`screenres_id MEDIUMINT UNSIGNED NOT NULL auto_increment,
-resolution VARCHAR(12) DEFAULT '',
-colordepth VARCHAR(5) DEFAULT '',
-antialias BOOL DEFAULT FALSE,
-PRIMARY KEY (screenres_id)`
-
-wp_slim_content_info tci
-
-`content_info_id MEDIUMINT UNSIGNED NOT NULL auto_increment,
-content_type VARCHAR(64) DEFAULT '',
-category VARCHAR(256) DEFAULT '',
-author VARCHAR(64) DEFAULT '',
-content_id BIGINT(20) DEFAULT 0,
-PRIMARY KEY (content_info_id)`
-
-wp_slim_outbound to
-
-`outbound_id INT UNSIGNED NOT NULL auto_increment,
-outbound_domain VARCHAR(255) DEFAULT '',
-outbound_resource VARCHAR(2048) DEFAULT '',
-type TINYINT UNSIGNED DEFAULT 0,
-notes VARCHAR(512) DEFAULT '',
-position VARCHAR(32) DEFAULT '',
-id INT UNSIGNED NOT NULL DEFAULT 0,
-dt INT(10) UNSIGNED DEFAULT 0,
-PRIMARY KEY (outbound_id)`
-
-= I noticed that the file `view.css` contains numerous base64 encoded strings, which I find kind of alarming. Is this normal? =
-
-I'm particularly serious when it comes to data integrity and safety, and I always try to put the best of my knowledge to make sure WP SlimStat is secure and doesn't carry any vulnerability.
-What you found in the CSS is a common technique used by experienced web developers to optimize site performances by 'embedding' small images (mainly icons)
-directly into the CSS, thus avoiding extra requests to the server to download all the media elements referenced by the page.
-You can get more information about this technique on [Wikipedia](http://en.wikipedia.org/wiki/Data_URI_scheme).
-
 == Screenshots ==
 
 1. What's happening right now on your site
@@ -342,17 +292,25 @@ You can get more information about this technique on [Wikipedia](http://en.wikip
 
 == Changelog ==
 
+= 3.0.1 =
+* Fixed: some minor bugs related to the new filter API (thank you, [StephenKorsman](http://wordpress.org/support/topic/upgraded-no-stats-per-post))
+* Fixed: improved browser detection accuracy by removing an old bug (thank you, psn)
+* Fixed: the link to the Settings page from Plugins > SlimStat was not working (thank you, [zircle](http://wordpress.org/support/topic/updated-to-30-and-permissions-problem))
+
 = 3.0 =
 * Added: a brand new client-side tracker, which replaces the previous one after 3 years of honorable duty. The new engine implements Wordpress Core Developers' guidelines on leveraging WP's built-in Ajax functionality, thus eliminating the need for custom hacks and non-standard implementations
 * Added: SERP positions are now displayed also under the Overview tab (thank you, Richie)
+* Added: you can finally customize those ugly colors associated to known users, search engines, etc. Check the FAQs to learn how.
 * Added: login page (wp-login.php) is now tracked
 * Added: two new powerful filters to leverage [MySQL Regular Expressions' power](http://dev.mysql.com/doc/refman/5.1/en/regexp.html): matches and does_not_match. Try for example to filter your stats where browser matches fire|chro ;) (thank you, [carbeck](http://wordpress.org/support/topic/feature-request-regex-in-show-records-where…-filters))
 * Added: you can now filter your metrics by post ID, for those who change their permalinks every now and then
 * Added: a few new metrics (Top Tags, Recent Downloads, Top Downloads). You may need to reset your Tabs in order to see the new boxes (go to Settings > Maintenance > Reset Tabs)
+* Added: a brand-new set of hooks for your actions and filters. Take a look at the [Documentation](http://slimstat.duechiacchiere.it/documentation/) for more information, or see [how you can use them](http://wordpress.org/support/topic/plugin-wp-slimstat-possible-to-suppress-cookies#post-4016035) to customize WP SlimStat's behavior
 * Added: new option to expand each row's details by default (thank you, [pedjas](http://wordpress.org/support/topic/can-we-get-absolute-count-numbers-in-stats))
 * Updated: a brand new JavaScript-based World Map replaces the existing Flash map, so that your mobile device can be happy now
 * Updated: admin menus have been consolidated and simplified (bye bye link under Dashboard, hello dropdown menu in the admin bar)
-* Updated: files have been consolidated as well, making the structure much easier to manage and more flexible, too
+* Updated: plugin files have been consolidated as well, making the structure much easier to manage and more flexible
+* Updated: viewer API has been partially rewritten and code optimizations have been implemented (which should make your stats appear faster)
 * Updated: after the nth complaint from a user who had deleted WP SlimStat by mistake, the Dashboard Widgets add-on is now available as a [separate plugin on the repository](http://wordpress.org/extend/plugins/wp-slimstat-dashboard-widgets/)
 * Updated: world map has been updated (thank you, [intrepidkarthi](http://wordpress.org/support/topic/indian-border-is-shown-wrongly-in-the-world-map-stats))
 * Updated: search terms detection is now more accurate when JavaScript Mode is turned on
@@ -362,7 +320,7 @@ You can get more information about this technique on [Wikipedia](http://en.wikip
 * Fixed: chart is using the correct max Y-axis when using intervals (thank you, [MGmirkin](http://wordpress.org/support/topic/feature-request-scale-graph-of-specific-date-range-by-views-during-that-range))
 * Fixed: bug that made all the stats disappear after activating the standalone menu (thank you, [Davide](http://www.davidetomasello.it/))
 * Fixed: bug in filtering Top Pages (thank you, [TechnoViel](http://wordpress.org/support/topic/slimstat-showing-old-hits-in-current-month-day-but-not-when-filtering-by-page))
-* Launched: [WP SlimStat](http://slimstat.duechiacchiere.it/) official website is now live
+* Launched: [WP SlimStat](http://slimstat.duechiacchiere.it/) official website is now live (and growing)
 
 = 2.9.5 =
 * Fixed: vulnerability that would allow visitors to inject javascript code into the admin, under specific circumstances (thank you, [mikes88](http://wordpress.org/support/topic/sanitize-the-plugin))

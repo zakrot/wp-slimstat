@@ -113,342 +113,214 @@ foreach ( array(
 				include_once(dirname(__FILE__).'/right-now.php');
 				break;
 			case 2:
-				$current_pageviews = wp_slimstat_db::count_records();
-				$chart_data = wp_slimstat_db::extract_data_for_chart('COUNT(t1.ip)', 'COUNT(DISTINCT(t1.ip))');
-
 				foreach(wp_slimstat_boxes::$all_boxes as $a_box_id){
 					switch($a_box_id){
 						case 'slim_p1_01':
 							wp_slimstat_boxes::box_header('slim_p1_01', wp_slimstat_boxes::$chart_tooltip, 'wide chart', false, 'noscroll', wp_slimstat_boxes::chart_title(__('Pageviews', 'wp-slimstat')));
-							wp_slimstat_boxes::show_chart('slim_p1_01', $chart_data, array(__('Pageviews','wp-slimstat'), __('Unique IPs','wp-slimstat')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_02':
 							wp_slimstat_boxes::box_header('slim_p1_02', '', '', false, 'noscroll');
-							wp_slimstat_boxes::show_about_wpslimstat('slim_p1_02');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_03':
 							wp_slimstat_boxes::box_header('slim_p1_03', '', '', false, 'noscroll');
-							wp_slimstat_boxes::show_overview_summary('slim_p1_03', $current_pageviews, $chart_data);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_04':
 							wp_slimstat_boxes::box_header('slim_p1_04', htmlspecialchars(__('When visitors leave a comment on your blog, Wordpress assigns them a cookie. WP SlimStat leverages this information to identify returning visitors.','wp-slimstat'), ENT_QUOTES, 'UTF-8'));
-							wp_slimstat_boxes::show_results('recent', 'slim_p1_04', 'user');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_05':
-							wp_slimstat_boxes::box_header('slim_p1_05', htmlspecialchars(__('Take a sneak peek at what human visitors are doing on your website','wp-slimstat'), ENT_QUOTES, 'UTF-8').'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</strong><p class="legend"><span class="little-color-box is-search-engine" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('From a search result page','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p>', 'medium', true);
-							wp_slimstat_boxes::show_spy_view('slim_p1_05');
-							wp_slimstat_boxes::box_footer();
+							wp_slimstat_boxes::box_header('slim_p1_05', htmlspecialchars(__('Take a sneak peek at what human visitors are doing on your website','wp-slimstat'), ENT_QUOTES, 'UTF-8').'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</strong><p class="legend"><span class="little-color-box is-search-engine" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('From a search result page','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-known-visitor" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Known Visitor','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p>', 'medium', true);
 							break;
 						case 'slim_p1_06':
 							wp_slimstat_boxes::box_header('slim_p1_06', htmlspecialchars(__('Keywords used by your visitors to find your website on a search engine','wp-slimstat'), ENT_QUOTES, 'UTF-8'), '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p1_06', 'searchterms');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_07':
 							wp_slimstat_boxes::box_header('slim_p1_07', htmlspecialchars(__('Unique sessions initiated by your visitors. If a user is inactive on your site for 30 minutes or more, any future activity will be attributed to a new session. Users that leave your site and return within 30 minutes will be counted as part of the original session.','wp-slimstat'), ENT_QUOTES, 'UTF-8'), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p1_07', 'language', array('total_for_percentage' => wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'), 'custom_where' => 't1.visit_id > 0 AND tb.type <> 1'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_08':
 							wp_slimstat_boxes::box_header('slim_p1_08', '', 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p1_08', 'SUBSTRING_INDEX(t1.resource, "?", 1)', array('total_for_percentage' => $current_pageviews, 'as_column' => 'resource', 'filter_op' => 'contains'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_09':
 							wp_slimstat_boxes::box_header('slim_p1_09', '', '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p1_09', 'country');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_10':
 							wp_slimstat_boxes::box_header('slim_p1_10', '', '', true);
-							wp_slimstat_boxes::show_results('popular_complete', 'slim_p1_10', 'domain', array('total_for_percentage' => wp_slimstat_db::count_records('t1.domain <> "" AND t1.domain <> "'.wp_slimstat_boxes::$home_url_parsed['host'].'"'), 'custom_where' => 't1.domain <> "" AND t1.domain <> "'.wp_slimstat_boxes::$home_url_parsed['host'].'"'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_11':
 							wp_slimstat_boxes::box_header('slim_p1_11', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p1_11', 'user', array('total_for_percentage' => wp_slimstat_db::count_records('t1.user <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_12':
 							wp_slimstat_boxes::box_header('slim_p1_12', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p1_12', 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('t1.searchterms <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_13':
 							wp_slimstat_boxes::box_header('slim_p1_13', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p1_13', 'country', array('total_for_percentage' => $current_pageviews));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p1_14':
 							wp_slimstat_boxes::box_header('slim_p1_14', '', 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p1_14', 'outbound_resource', array('total_for_percentage' => wp_slimstat_db::count_records('tob.outbound_resource <> "" AND tob.type = 1'), 'custom_where' => 'tob.type = 1'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						default:
 					}
+					wp_slimstat_boxes::show_report_wrapper($a_box_id);
+					wp_slimstat_boxes::box_footer();
 				}
 				break;
 			case 3:
-				$current_pageviews = wp_slimstat_db::count_records();
-				$total_human_hits = wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1');
-				$total_human_visits = wp_slimstat_db::count_records_having('t1.visit_id > 0 AND tb.type <> 1', 'visit_id');
-
 				foreach(wp_slimstat_boxes::$all_boxes as $a_box_id){
 					switch($a_box_id){
 						case 'slim_p2_01':
 							wp_slimstat_boxes::box_header('slim_p2_01', wp_slimstat_boxes::$chart_tooltip, 'wide', false, 'noscroll', wp_slimstat_boxes::chart_title(__('Human Visits', 'wp-slimstat')));
-							wp_slimstat_boxes::show_chart('slim_p2_01', wp_slimstat_db::extract_data_for_chart('COUNT(DISTINCT t1.visit_id)', 'COUNT(DISTINCT t1.ip)', 'AND (tb.type = 0 OR tb.type = 2) AND t1.visit_id <> 0'), array(__('Visits','wp-slimstat'), __('Unique IPs','wp-slimstat')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_02': 
 							wp_slimstat_boxes::box_header('slim_p2_02', '', '', false, 'noscroll');
-							wp_slimstat_boxes::show_visitors_summary('slim_p2_02', $total_human_hits, $total_human_visits);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_03':
 							wp_slimstat_boxes::box_header('slim_p2_03', htmlspecialchars(__('This report shows you what languages your users have installed on their computers.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p2_03', 'language', array('total_for_percentage' => $current_pageviews));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_04':
 							wp_slimstat_boxes::box_header('slim_p2_04', htmlspecialchars(__('A user agent is a generic term for any program used for accessing a website. This includes browsers (such as Chrome), robots and spiders, and any other software program that retrieves information from a website.<br><br>You can ignore any given user agent by setting the corresponding filter under Settings > SlimStat > Filters.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p2_04', 'browser', array('total_for_percentage' => $current_pageviews, 'more_columns' => ',tb.version'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_05':
 							wp_slimstat_boxes::box_header('slim_p2_05', htmlspecialchars(__('Internet Service Provider: a company which provides other companies or individuals with access to the Internet. Your DSL or cable internet service is provided to you by your ISP.<br><br>You can ignore specific IP addresses by setting the corresponding filter under Settings > SlimStat > Filters.','wp-slimstat'), ENT_QUOTES), 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p2_05', 'ip', array('total_for_percentage' => $current_pageviews));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_06':
 							wp_slimstat_boxes::box_header('slim_p2_06', htmlspecialchars(__('Which operating systems do your visitors use? Optimizing your site for the appropriate technical capabilities helps make your site more engaging and usable and can result in higher conversion rates and more sales.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p2_06', 'platform', array('total_for_percentage' => $current_pageviews));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_07':
 							wp_slimstat_boxes::box_header('slim_p2_07', htmlspecialchars(__('This report shows the most common screen resolutions used by your visitors. Knowing the most popular screen resolution of your visitors will help you create content optimized for that resolution or you may opt for resolution-independence.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p2_07', 'resolution', array('total_for_percentage' => wp_slimstat_db::count_records('tss.resolution <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_09':
 							wp_slimstat_boxes::box_header('slim_p2_09', htmlspecialchars(__("Which versions of Flash do your visitors have installed? Is Java supported on your visitors' platforms?",'wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_plugins('slim_p2_09', $total_human_hits);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_10':
 							wp_slimstat_boxes::box_header('slim_p2_10', htmlspecialchars(__('You can configure WP SlimStat to ignore a specific Country by setting the corresponding filter under Settings > SlimStat > Filters.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p2_10', 'country', array('total_for_percentage' => $current_pageviews));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_12':
 							wp_slimstat_boxes::box_header('slim_p2_12');
-							wp_slimstat_boxes::show_visit_duration('slim_p2_12', $total_human_visits);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_13':
 							wp_slimstat_boxes::box_header('slim_p2_13', htmlspecialchars(__('You can ignore any specific Country by setting the corresponding filter under Settings > SlimStat > Filters.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p2_13', 'country');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_14':
 							wp_slimstat_boxes::box_header('slim_p2_14', htmlspecialchars(__('This report shows the most recent screen resolutions used by your visitors. Knowing the most popular screen resolution of your visitors will help you create content optimized for that resolution or you may opt for resolution-independence.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p2_14', 'resolution', array('join_tables' => 'tss.*'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_15':
 							wp_slimstat_boxes::box_header('slim_p2_15', htmlspecialchars(__('Which operating systems do your visitors use? Optimizing your site for the appropriate technical capabilities helps make your site more engaging and usable and can result in higher conversion rates and more sales.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p2_15', 'platform', array('join_tables' => 'tb.*'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_16':
 							wp_slimstat_boxes::box_header('slim_p2_16', htmlspecialchars(__('A user agent is a generic term for any program used for accessing a website. This includes browsers (such as Chrome), robots and spiders, and any other software program that retrieves information from a website.<br><br>You can ignore any given user agent by setting the corresponding filter under Settings > SlimStat > Filters.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p2_16', 'browser', array('join_tables' => 'tb.*'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p2_17':
 							wp_slimstat_boxes::box_header('slim_p2_17', htmlspecialchars(__('This report shows you what languages your users have installed on their computers.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p2_17', 'language');
-							wp_slimstat_boxes::box_footer();
 							break;
 						default:
 					}
+					wp_slimstat_boxes::show_report_wrapper($a_box_id);
+					wp_slimstat_boxes::box_footer();
 				}
 				break;
 			case 4:
-				// This tab has a slightly different query for the chart
-				$sql_from_where = "
-					FROM (
-						SELECT t1.visit_id, count(t1.ip) count, MAX(t1.dt) dt
-						FROM [from_tables]
-						WHERE [where_clause]
-						GROUP BY t1.visit_id
-					) AS ts1";
-
 				foreach(wp_slimstat_boxes::$all_boxes as $a_box_id){
 					switch($a_box_id){
 						case 'slim_p4_01':
 							wp_slimstat_boxes::box_header('slim_p4_01', wp_slimstat_boxes::$chart_tooltip, 'wide', false, 'noscroll', wp_slimstat_boxes::chart_title(__('Average Pageviews per Visit', 'wp-slimstat')));
-							wp_slimstat_boxes::show_chart('slim_p4_01', wp_slimstat_db::extract_data_for_chart('ROUND(AVG(ts1.count),2)', 'MAX(ts1.count)', 'AND t1.visit_id > 0', $sql_from_where), array(__('Avg Pageviews','wp-slimstat'), __('Longest visit','wp-slimstat')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_02':
 							wp_slimstat_boxes::box_header('slim_p4_02', htmlspecialchars(__("This report lists the most recent posts viewed on your site, by title.",'wp-slimstat'), ENT_QUOTES), 'medium');
-							wp_slimstat_boxes::show_results('recent', 'slim_p4_02', 'resource', array('custom_where' => 'tci.content_type = "post"'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_03':
 							wp_slimstat_boxes::box_header('slim_p4_03', htmlspecialchars(__('A <em>bounce page</em> is a single-page visit, or visit in which the person left your site from the entrance (landing) page.','wp-slimstat'), ENT_QUOTES), 'medium');
-							wp_slimstat_boxes::show_results('recent', 'slim_p4_03', 'resource', array('having_clause' => 'HAVING COUNT(visit_id) = 1'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_04':
 							wp_slimstat_boxes::box_header('slim_p4_04', '', 'medium');
-							wp_slimstat_boxes::show_results('recent', 'slim_p4_04', 'resource', array('custom_where' => '(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_05':
 							wp_slimstat_boxes::box_header('slim_p4_05', htmlspecialchars(__('The 404 or Not Found error message is a HTTP standard response code indicating that the client was able to communicate with the server, but the server could not find what was requested.<br><br>This report can be useful to detect attack attempts, by looking at patterns in 404 URLs.','wp-slimstat'), ENT_QUOTES));
-							wp_slimstat_boxes::show_results('recent', 'slim_p4_05', 'resource', array('custom_where' => '(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_06':
 							wp_slimstat_boxes::box_header('slim_p4_06', htmlspecialchars(__("Searches performed using Wordpress' built-in search functionality.",'wp-slimstat'), ENT_QUOTES));
-							wp_slimstat_boxes::show_results('recent', 'slim_p4_06', 'searchterms', array('custom_where' => '(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_07':
 							wp_slimstat_boxes::box_header('slim_p4_07', htmlspecialchars(__("Categories provide a helpful way to group related posts together, and to quickly tell readers what a post is about. Categories also make it easier for people to find your content.",'wp-slimstat'), ENT_QUOTES));
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_07', 'category', array('total_for_percentage' => wp_slimstat_db::count_records('tci.content_type LIKE "%category%"'), 'custom_where' => '(tci.content_type LIKE "%category%")', 'more_columns' => ',tci.category'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_08':
 							wp_slimstat_boxes::box_header('slim_p4_08', htmlspecialchars(__("<strong>Link Details</strong><br>- <em>A:n</em> means that the n-th link in the page was clicked.<br>- <em>ID:xx</em> is shown when the corresponding link has an ID attribute associated to it.",'wp-slimstat'), ENT_QUOTES).'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES).'</strong><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES).'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES).'</p>', 'medium');
-							wp_slimstat_boxes::show_spy_view('slim_p4_08', 0);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_10':
 							wp_slimstat_boxes::box_header('slim_p4_10', htmlspecialchars(__("This report lists any <em>event</em> occurred on your website. Please refer to the FAQ for more information on how to leverage this functionality.",'wp-slimstat'), ENT_QUOTES).'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES).'</strong><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES).'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES).'</p>', 'medium');
-							wp_slimstat_boxes::show_spy_view('slim_p4_10', -1);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_11':
 							wp_slimstat_boxes::box_header('slim_p4_11', htmlspecialchars(__("This report lists the most popular posts on your site, by title.",'wp-slimstat'), ENT_QUOTES), 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_11', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('tci.content_type = "post"'), 'custom_where' => 'tci.content_type = "post"'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_12':
 							wp_slimstat_boxes::box_header('slim_p4_12', '', 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_12', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'), 'custom_where' => '(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_13':
 							wp_slimstat_boxes::box_header('slim_p4_13', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_13', 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'), 'custom_where' => '(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_14':
 							wp_slimstat_boxes::box_header('slim_p4_14', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_14', 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('t1.searchterms <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_15':
 							wp_slimstat_boxes::box_header('slim_p4_15', '', 'medium', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p4_15', 'resource', array('custom_where' => '(tci.content_type LIKE "%category%")', 'join_tables' => 'tci.*'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_16':
 							wp_slimstat_boxes::box_header('slim_p4_16', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_16', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'), 'custom_where' => '(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_17':
 							wp_slimstat_boxes::box_header('slim_p4_17', '', 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_17', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('t1.domain <> ""'), 'custom_where' => 't1.domain <> ""'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_18':
 							wp_slimstat_boxes::box_header('slim_p4_18', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_18', 'author', array('total_for_percentage' => wp_slimstat_db::count_records('tci.author <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_19':
 							wp_slimstat_boxes::box_header('slim_p4_19', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p4_19', 'category', array('total_for_percentage' => wp_slimstat_db::count_records('(tci.content_type LIKE "%tag%")'), 'custom_where' => '(tci.content_type LIKE "%tag%")', 'more_columns' => ',tci.category'));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p4_20':
 							wp_slimstat_boxes::box_header('slim_p4_20', htmlspecialchars(__("<strong>Link Details</strong><br>- <em>A:n</em> means that the n-th link in the page was clicked.<br>- <em>ID:xx</em> is shown when the corresponding link has an ID attribute associated to it.",'wp-slimstat'), ENT_QUOTES).'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES).'</strong><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES).'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES).'</p>', 'medium');
-							wp_slimstat_boxes::show_spy_view('slim_p4_20', 1);
-							wp_slimstat_boxes::box_footer();
 							break;
 						default:
 							break;
 					}
+					wp_slimstat_boxes::show_report_wrapper($a_box_id);
+					wp_slimstat_boxes::box_footer();
 				}
 				break;
 			case 5:
-				// Data about our visits
-				$current_pageviews = wp_slimstat_db::count_records();
-				$count_pageviews_with_referer = wp_slimstat_db::count_records('t1.referer <> ""');
-
 				foreach(wp_slimstat_boxes::$all_boxes as $a_box_id){
 					switch($a_box_id){
 						case 'slim_p3_01':
 							wp_slimstat_boxes::box_header('slim_p3_01', wp_slimstat_boxes::$chart_tooltip, 'wide', false, 'noscroll', wp_slimstat_boxes::chart_title(__('Traffic Sources', 'wp-slimstat')));
-							wp_slimstat_boxes::show_chart('slim_p3_01', wp_slimstat_db::extract_data_for_chart('COUNT(DISTINCT(`domain`))', 'COUNT(DISTINCT(ip))', "AND domain <> '' AND domain <> '{$_SERVER['SERVER_NAME']}'"), array(__('Domains','wp-slimstat'), __('Unique IPs','wp-slimstat')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_02':
 							wp_slimstat_boxes::box_header('slim_p3_02', '', '', false, 'noscroll');
-							wp_slimstat_boxes::show_traffic_sources_summary('slim_p3_02', $current_pageviews);
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_03':
 							wp_slimstat_boxes::box_header('slim_p3_03', '', '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p3_03', 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('t1.searchterms <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_04':
 							wp_slimstat_boxes::box_header('slim_p3_04', htmlspecialchars(__('You can configure WP SlimStat to ignore a specific Country by setting the corresponding filter under Settings > SlimStat > Filters.','wp-slimstat'), ENT_QUOTES), '', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p3_04', 'country', array('total_for_percentage' => $current_pageviews));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_05':
 							wp_slimstat_boxes::box_header('slim_p3_05', '', '', true);
-							wp_slimstat_boxes::show_results('popular_complete', 'slim_p3_05', 'domain', array('total_for_percentage' => wp_slimstat_db::count_records('t1.referer <> ""')));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_06':
 							wp_slimstat_boxes::box_header('slim_p3_06', '', 'medium', true);
-							wp_slimstat_boxes::show_results('popular_complete', 'slim_p3_06', 'domain', array('total_for_percentage' => wp_slimstat_db::count_records("t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}' AND t1.domain <> ''", 't1.id'), 'custom_where' => "t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}'"));
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_08':
-							wp_slimstat_boxes::box_header('slim_p3_08', htmlspecialchars(__('Take a sneak peek at what human visitors are doing on your website','wp-slimstat'), ENT_QUOTES).'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES).'</strong><p class="legend"><span class="little-color-box is-search-engine" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('From a search result page','wp-slimstat'), ENT_QUOTES).'</p><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES).'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span>'.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES).'</p>', 'medium', true);
-							wp_slimstat_boxes::show_spy_view('slim_p3_08');
-							wp_slimstat_boxes::box_footer();
+							wp_slimstat_boxes::box_header('slim_p3_08', htmlspecialchars(__('Take a sneak peek at what human visitors are doing on your website','wp-slimstat'), ENT_QUOTES, 'UTF-8').'<br><br><strong>'.htmlspecialchars(__('Color codes','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</strong><p class="legend"><span class="little-color-box is-search-engine" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('From a search result page','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-known-visitor" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Known Visitor','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-known-user" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Known Users','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p><p class="legend"><span class="little-color-box is-direct" style="padding:0 5px">&nbsp;&nbsp;</span> '.htmlspecialchars(__('Other Humans','wp-slimstat'), ENT_QUOTES, 'UTF-8').'</p>', 'medium', true);
 							break;
 						case 'slim_p3_09':
 							wp_slimstat_boxes::box_header('slim_p3_09', htmlspecialchars(__('Keywords used by your visitors to find your website on a search engine','wp-slimstat'), ENT_QUOTES), 'medium', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p3_09', 'searchterms');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_10':
 							wp_slimstat_boxes::box_header('slim_p3_10', '', '', true);
-							wp_slimstat_boxes::show_results('recent', 'slim_p3_10', 'country');
-							wp_slimstat_boxes::box_footer();
 							break;
 						case 'slim_p3_11':
 							wp_slimstat_boxes::box_header('slim_p3_11', '', 'medium', true);
-							wp_slimstat_boxes::show_results('popular', 'slim_p3_11', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('t1.domain <> ""'), 'custom_where' => 't1.domain <> ""'));
-							wp_slimstat_boxes::box_footer();
 						default:
 							break;
 					}
+					wp_slimstat_boxes::show_report_wrapper($a_box_id);
+					wp_slimstat_boxes::box_footer();
 				}
 				break;
 			case 6:

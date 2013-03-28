@@ -470,6 +470,7 @@ class wp_slimstat_boxes{
 			
 			// Data for the chart
 			SlimStatAdmin.ticks = [<?php echo $_chart_data['ticks'] ?>];
+			SlimStatAdmin.data = [];
 			SlimStatAdmin.data.push({<?php echo !empty($_chart_data['markings'])?"data:[{$_chart_data['markings']}],bars:{show:true,radius:1,barWidth:0.2,lineWidth:1,align:'center',fill:true,fillColor:'#bbff44',},lines:{show:false}":''; ?>});
 			SlimStatAdmin.data.push({<?php echo !empty($_chart_data['previous']['data'])?"label:'{$_chart_labels[0]} ".wp_slimstat_db::$timeframes['label_previous']."',data:[{$_chart_data['previous']['data']}],points:{show:true,symbol:function(ctx, x, y, radius, shadow){ctx.arc(x, y, 2, 0, Math.PI * 2, false)}}":''; ?>});
 			SlimStatAdmin.data.push({label:'<?php echo $_chart_labels[1].' '.wp_slimstat_db::$timeframes['label_current'] ?>',data:[<?php echo $_chart_data['current']['data2'] ?>],points:{show:true,symbol:function(ctx, x, y, radius, shadow){ctx.arc(x, y, 2, 0, Math.PI * 2, false)}}});
@@ -554,11 +555,11 @@ class wp_slimstat_boxes{
 		if ($_id != 'p0' && (in_array($_id, self::$hidden_boxes) || wp_slimstat::$options['async_load'] == 'yes')) return; ?>
 		<p><?php _e('Total Pageviews', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('1=1', '*', false, '', false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php _e('DB Size', 'wp-slimstat') ?> <span><?php echo wp_slimstat_db::get_data_size() ?></span></p>
-		<p><?php _e('Tracking Active', 'wp-slimstat') ?> <span><?php _e(wp_slimstat::$options['is_tracking'], 'wp-slimstat') ?></span></p>
-		<p><?php _e('Javascript Mode', 'wp-slimstat') ?> <span><?php _e(wp_slimstat::$options['javascript_mode'], 'wp-slimstat') ?></span></p>
-		<p><?php _e('Tracking Browser Caps', 'wp-slimstat') ?> <span><?php _e(wp_slimstat::$options['enable_javascript'], 'wp-slimstat') ?></span></p>
+		<p><?php _e('Tracking Active', 'wp-slimstat') ?> <span><?php _e(ucfirst(wp_slimstat::$options['is_tracking']), 'wp-slimstat') ?></span></p>
+		<p><?php _e('Javascript Mode', 'wp-slimstat') ?> <span><?php _e(ucfirst(wp_slimstat::$options['javascript_mode']), 'wp-slimstat') ?></span></p>
+		<p><?php _e('Tracking Browser Caps', 'wp-slimstat') ?> <span><?php _e(ucfirst(wp_slimstat::$options['enable_javascript']), 'wp-slimstat') ?></span></p>
 		<p><?php _e('Auto purge', 'wp-slimstat') ?> <span><?php echo (wp_slimstat::$options['auto_purge'] > 0)?wp_slimstat::$options['auto_purge'].' '.__('days','wp-slimstat'):__('No','wp-slimstat') ?></span></p>
-		<p><?php _e('Oldest pageview', 'wp-slimstat') ?> <span><?php $dt = wp_slimstat_db::get_oldest_visit('ASC'); echo ($dt == null)?__('No visits','wp-slimstat'):date_i18n(get_option('date_format'), $dt) ?></span></p>
+		<p><?php _e('Oldest pageview', 'wp-slimstat') ?> <span><?php $dt = wp_slimstat_db::get_oldest_visit(); echo ($dt == null)?__('No visits','wp-slimstat'):date_i18n(get_option('date_format'), $dt) ?></span></p>
 		<p>Geo IP <span><?php echo date_i18n(get_option('date_format'), @filemtime(WP_PLUGIN_DIR.'/wp-slimstat/admin/geoip.csv')) ?></span></p><?php
 	}
 
@@ -595,15 +596,15 @@ class wp_slimstat_boxes{
 		if ($_id != 'p0' && (in_array($_id, self::$hidden_boxes) || wp_slimstat::$options['async_load'] == 'yes')) return;
 
 		$new_visitors = wp_slimstat_db::count_records_having('visit_id > 0', 'ip', 'COUNT(visit_id) = 1');
-		$bounce_rate = ($_total_human_hits > 0)?sprintf("%01.2f", (100*$new_visitors/$_total_human_hits)):0;
-		if (intval($bounce_rate) > 99) $bounce_rate = '100';
+		$new_visitors_rate = ($_total_human_hits > 0)?sprintf("%01.2f", (100*$new_visitors/$_total_human_hits)):0;
+		if (intval($new_visitors_rate) > 99) $new_visitors_rate = '100';
 		$metrics_per_visit = wp_slimstat_db::get_max_and_average_pages_per_visit(); ?>
 			<p><?php self::inline_help(htmlentities(__('A visit is a session of at most 30 minutes. Returning visitors are counted multiple times if they perform multiple visits.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
 				<?php _e('Human visits', 'wp-slimstat') ?> <span><?php echo number_format($_total_human_visits, 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 			<p><?php self::inline_help(htmlentities(__('This number includes <strong>human visits</strong> only.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
 				<?php _e('Unique IPs', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1', 't1.ip'), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 			<p><?php self::inline_help(htmlentities(__('Percentage of single-page visits, i.e. visits in which the person left your site from the entrance page.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
-				<?php _e('Bounce rate', 'wp-slimstat') ?> <span><?php echo number_format($bounce_rate, 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?>%</span></p>
+				<?php _e('Bounce rate', 'wp-slimstat') ?> <span><?php echo number_format($new_visitors_rate, 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?>%</span></p>
 			<p><?php self::inline_help(htmlentities(__('Visitors who had previously left a comment on your blog.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
 				<?php _e('Known visitors', 'wp-slimstat') ?> <span><?php echo wp_slimstat_db::count_records('t1.user <> ""', 't1.user') ?></span></p>
 			<p><?php self::inline_help(htmlentities(__('Human users who visited your site only once.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
@@ -674,8 +675,8 @@ class wp_slimstat_boxes{
 
 		$total_human_hits = wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1');
 		$new_visitors = wp_slimstat_db::count_records_having('visit_id > 0', 'ip', 'COUNT(visit_id) = 1');
-		$bounce_rate = ($total_human_hits > 0)?sprintf("%01.2f", (100*$new_visitors/$total_human_hits)):0;
-		if (intval($bounce_rate) > 99) $bounce_rate = '100'; ?>		
+		$new_visitors_rate = ($total_human_hits > 0)?sprintf("%01.2f", (100*$new_visitors/$total_human_hits)):0;
+		if (intval($new_visitors_rate) > 99) $new_visitors_rate = '100'; ?>		
 		<p><?php self::inline_help(htmlentities(__('A request to load a single HTML file. WP SlimStat logs a "pageview" each time the tracking code is executed.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
 			<?php _e('Pageviews', 'wp-slimstat') ?> <span><?php echo number_format($_current_pageviews, 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php self::inline_help(htmlentities(__('A referrer (or referring site) is the site that a visitor previously visited before following a link to your site.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
@@ -689,17 +690,30 @@ class wp_slimstat_boxes{
 		<p><?php self::inline_help(htmlentities(__("Number of single-page visits to your site over the selected period.",'wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
 			<?php _e('Bounce Pages', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_bouncing_pages(), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php self::inline_help(htmlentities(__('Percentage of single-page visits, i.e. visits in which the person left your site from the entrance page.','wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
-			<?php _e('Bounce rate', 'wp-slimstat') ?> <span><?php echo number_format($bounce_rate, 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?>%</span></p>
+			<?php _e('New Visitors Rate', 'wp-slimstat') ?> <span><?php echo number_format($new_visitors_rate, 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?>%</span></p>
 		<p><?php self::inline_help(htmlentities(__("Visitors who visited the site in the last 5 minutes coming from a search engine.",'wp-slimstat'), ENT_QUOTES, 'UTF-8')) ?>
 			<?php _e('Currently from search engines', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records("t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}' AND t1.domain <> '' AND t1.dt > UNIX_TIMESTAMP()-300", 't1.id', false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p><?php
 	}
 	
-	public static function ajax_show_report(){
-		// Make sure the request is coming from the right place
-		check_ajax_referer('meta-box-order', 'security');
+	public static function show_report_wrapper($_box_id = 'p0'){
+
+		$box_id = ''; $is_ajax = true;
+		if (!empty($_POST['box_id'])){
+			// Let's make sure the request is coming from the right place
+			check_ajax_referer('meta-box-order', 'security');
+			$box_id = $_POST['box_id'];
+			$ajax_box_id = 'p0';
+		}
+		else if (!empty($_box_id)){
+			$box_id = $ajax_box_id = '#'.$_box_id;
+		}
 
 		// Some boxes need extra information
-		switch($_POST['box_id']){
+		if (in_array($box_id, array('#slim_p1_03', '#slim_p1_08', '#slim_p1_13', '#slim_p2_03', '#slim_p2_04', '#slim_p2_05', '#slim_p2_06', '#slim_p2_10', '#slim_p3_02', '#slim_p3_04'))){
+			$current_pageviews = wp_slimstat_db::count_records();
+		}
+
+		switch($box_id){
 			case '#slim_p1_01':
 			case '#slim_p1_03':
 				$chart_data = wp_slimstat_db::extract_data_for_chart('COUNT(t1.ip)', 'COUNT(DISTINCT(t1.ip))');
@@ -721,160 +735,157 @@ class wp_slimstat_boxes{
 			default:
 		}
 		
-		switch($_POST['box_id']){
+		switch($box_id){
 			case '#slim_p1_01':
 			case '#slim_p2_01':
 			case '#slim_p3_01':
 			case '#slim_p4_01':
-				self::show_chart('p0', $chart_data, $chart_labels);
+				self::show_chart($ajax_box_id, $chart_data, $chart_labels);
 				break;
 			case '#slim_p1_02':
-				self::show_about_wpslimstat();
+				self::show_about_wpslimstat($ajax_box_id);
 				break;
 			case '#slim_p1_03':
-				self::show_overview_summary('p0', wp_slimstat_db::count_records(), $chart_data);
+				self::show_overview_summary($ajax_box_id, $current_pageviews, $chart_data);
 				break;
 			case '#slim_p1_04':
-				self::show_results('recent', 'p0', 'user');
+				self::show_results('recent', $ajax_box_id, 'user');
 				break;
 			case '#slim_p1_05':
 			case '#slim_p3_08':
-				self::show_spy_view('p0');
+				self::show_spy_view($ajax_box_id);
 				break;
 			case '#slim_p1_06':
 			case '#slim_p3_09':
-				self::show_results('recent', 'p0', 'searchterms');
+				self::show_results('recent', $ajax_box_id, 'searchterms');
 				break;
 			case '#slim_p1_07':
-				self::show_results('popular', 'p0', 'language', array('total_for_percentage' => wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'), 'custom_where' => 't1.visit_id > 0 AND tb.type <> 1'));
+				self::show_results('popular', $ajax_box_id, 'language', array('total_for_percentage' => wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'), 'custom_where' => 't1.visit_id > 0 AND tb.type <> 1'));
 				break;
 			case '#slim_p1_08':
-				self::show_results('popular', 'p0', 'SUBSTRING_INDEX(t1.resource, "?", 1)', array('total_for_percentage' => wp_slimstat_db::count_records(), 'as_column' => 'resource', 'filter_op' => 'contains'));
+				self::show_results('popular', $ajax_box_id, 'SUBSTRING_INDEX(t1.resource, "?", 1)', array('total_for_percentage' => $current_pageviews, 'as_column' => 'resource', 'filter_op' => 'contains'));
 				break;
 			case '#slim_p1_09':
 			case '#slim_p2_13':
 			case '#slim_p3_10':
-				self::show_results('recent', 'p0', 'country');
+				self::show_results('recent', $ajax_box_id, 'country');
 				break;
 			case '#slim_p1_10':
 			case '#slim_p3_05':
-				self::show_results('popular_complete', 'p0', 'domain', array('total_for_percentage' => wp_slimstat_db::count_records('t1.referer <> ""')));
+				self::show_results('popular_complete', $ajax_box_id, 'domain', array('total_for_percentage' => wp_slimstat_db::count_records('t1.referer <> ""')));
 				break;
 			case '#slim_p1_11':
-				self::show_results('popular', 'p0', 'user', array('total_for_percentage' => wp_slimstat_db::count_records('t1.user <> ""')));
+				self::show_results('popular', $ajax_box_id, 'user', array('total_for_percentage' => wp_slimstat_db::count_records('t1.user <> ""')));
 				break;
 			case '#slim_p1_12':
 			case '#slim_p3_03':
 			case '#slim_p4_14':
-				self::show_results('popular', 'p0', 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('t1.searchterms <> ""')));
+				self::show_results('popular', $ajax_box_id, 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('t1.searchterms <> ""')));
 				break;
 			case '#slim_p1_13':
 			case '#slim_p2_10':
 			case '#slim_p3_04':
-				self::show_results('popular', 'p0', 'country', array('total_for_percentage' => wp_slimstat_db::count_records()));
+				self::show_results('popular', $ajax_box_id, 'country', array('total_for_percentage' => $current_pageviews));
 				break;
 			case '#slim_p1_14':
-				self::show_results('popular', 'p0', 'outbound_resource', array('total_for_percentage' => wp_slimstat_db::count_records('tob.outbound_resource <> "" AND tob.type = 1'), 'custom_where' => 'tob.type = 1'));
+				self::show_results('popular', $ajax_box_id, 'outbound_resource', array('total_for_percentage' => wp_slimstat_db::count_records('tob.outbound_resource <> "" AND tob.type = 1'), 'custom_where' => 'tob.type = 1'));
 				break;
 			case '#slim_p2_02':
-				self::show_visitors_summary('p0', wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'), wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1', 'visit_id'));
+				self::show_visitors_summary($ajax_box_id, wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'), wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1', 'visit_id'));
 				break;
 			case '#slim_p2_03':
-				self::show_results('popular', 'p0', 'language', array('total_for_percentage' => wp_slimstat_db::count_records()));
+				self::show_results('popular', $ajax_box_id, 'language', array('total_for_percentage' => $current_pageviews));
 				break;
 			case '#slim_p2_04':
-				self::show_results('popular', 'p0', 'browser', array('total_for_percentage' => wp_slimstat_db::count_records(), 'more_columns' => ',tb.version'));
+				self::show_results('popular', $ajax_box_id, 'browser', array('total_for_percentage' => $current_pageviews, 'more_columns' => ',tb.version'));
 				break;
 			case '#slim_p2_05':
-				self::show_results('popular', 'p0', 'ip', array('total_for_percentage' => wp_slimstat_db::count_records()));
+				self::show_results('popular', $ajax_box_id, 'ip', array('total_for_percentage' =>$current_pageviews));
 				break;
 			case '#slim_p2_06':
-				self::show_results('popular', 'p0', 'platform', array('total_for_percentage' => wp_slimstat_db::count_records()));
+				self::show_results('popular', $ajax_box_id, 'platform', array('total_for_percentage' => $current_pageviews));
 				break;
 			case '#slim_p2_07':
-				self::show_results('popular', 'p0', 'resolution', array('total_for_percentage' => wp_slimstat_db::count_records('tss.resolution <> ""')));
+				self::show_results('popular', $ajax_box_id, 'resolution', array('total_for_percentage' => wp_slimstat_db::count_records('tss.resolution <> ""')));
 				break;
 			case '#slim_p2_09':
-				self::show_plugins('p0', wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'));
-				break;
-			case '#slim_p2_10':
-				wp_slimstat_boxes::show_results('popular', 'p0', 'country', array('total_for_percentage' => wp_slimstat_db::count_records()));
+				self::show_plugins($ajax_box_id, wp_slimstat_db::count_records('t1.visit_id > 0 AND tb.type <> 1'));
 				break;
 			case '#slim_p2_12':
-				self::show_visit_duration('p0', wp_slimstat_db::count_records('visit_id > 0 AND tb.type <> 1', 'visit_id'));
+				self::show_visit_duration($ajax_box_id, wp_slimstat_db::count_records('visit_id > 0 AND tb.type <> 1', 'visit_id'));
 				break;
 			case '#slim_p2_14':
-				self::show_results('recent', 'p0', 'resolution', array('join_tables' => 'tss.*'));
+				self::show_results('recent', $ajax_box_id, 'resolution', array('join_tables' => 'tss.*'));
 				break;
 			case '#slim_p2_15':
-				self::show_results('recent', 'p0', 'platform', array('join_tables' => 'tb.*'));
+				self::show_results('recent', $ajax_box_id, 'platform', array('join_tables' => 'tb.*'));
 				break;
 			case '#slim_p2_16':
-				self::show_results('recent', 'p0', 'browser', array('join_tables' => 'tb.*'));
+				self::show_results('recent', $ajax_box_id, 'browser', array('join_tables' => 'tb.*'));
 				break;
 			case '#slim_p2_17':
-				self::show_results('recent', 'p0', 'language');
+				self::show_results('recent', $ajax_box_id, 'language');
 				break;
 			case '#slim_p3_02':
-				self::show_traffic_sources_summary('p0', wp_slimstat_db::count_records());
+				self::show_traffic_sources_summary($ajax_box_id, $current_pageviews);
 				break;
 			case '#slim_p3_06':
-				self::show_results('popular_complete', 'p0', 'domain', array('total_for_percentage' => wp_slimstat_db::count_records("t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}' AND t1.domain <> ''", 't1.id'), 'custom_where' => "t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}'"));
+				self::show_results('popular_complete', $ajax_box_id, 'domain', array('total_for_percentage' => wp_slimstat_db::count_records("t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}' AND t1.domain <> ''", 't1.id'), 'custom_where' => "t1.searchterms <> '' AND t1.domain <> '{$_SERVER['SERVER_NAME']}'"));
 				break;
 			case '#slim_p3_11':
 			case '#slim_p4_17':
-				self::show_results('popular', 'p0', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('t1.domain <> ""'), 'custom_where' => 't1.domain <> ""'));
+				self::show_results('popular', $ajax_box_id, 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('t1.domain <> ""'), 'custom_where' => 't1.domain <> ""'));
 				break;
 			case '#slim_p4_02':
-				self::show_results('recent', 'p0', 'resource', array('custom_where' => 'tci.content_type = "post"'));
+				self::show_results('recent', $ajax_box_id, 'resource', array('custom_where' => 'tci.content_type = "post"'));
 				break;
 			case '#slim_p4_03':
-				self::show_results('recent', 'p0', 'resource', array('having_clause' => 'HAVING COUNT(visit_id) = 1'));
+				self::show_results('recent', $ajax_box_id, 'resource', array('custom_where' => 'tci.content_type <> "404"', 'having_clause' => 'HAVING COUNT(visit_id) = 1'));
 				break;
 			case '#slim_p4_04':
-				self::show_results('recent', 'p0', 'resource', array('custom_where' => '(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'));
+				self::show_results('recent', $ajax_box_id, 'resource', array('custom_where' => '(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'));
 				break;
 			case '#slim_p4_05':
-				self::show_results('recent', 'p0', 'resource', array('custom_where' => '(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'));
+				self::show_results('recent', $ajax_box_id, 'resource', array('custom_where' => '(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'));
 				break;
 			case '#slim_p4_06':
-				self::show_results('recent', 'p0', 'searchterms', array('custom_where' => '(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'));
+				self::show_results('recent', $ajax_box_id, 'searchterms', array('custom_where' => '(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'));
 				break;
 			case '#slim_p4_07':
-				self::show_results('popular', 'p0', 'category', array('total_for_percentage' => wp_slimstat_db::count_records('(tci.content_type LIKE "%category%")'), 'custom_where' => '(tci.content_type LIKE "%category%")', 'more_columns' => ',tci.category'));
+				self::show_results('popular', $ajax_box_id, 'category', array('total_for_percentage' => wp_slimstat_db::count_records('(tci.content_type LIKE "%category%")'), 'custom_where' => '(tci.content_type LIKE "%category%")', 'more_columns' => ',tci.category'));
 				break;
 			case '#slim_p4_08':
-				self::show_spy_view('p0', 0);
+				self::show_spy_view($ajax_box_id, 0);
 				break;
 			case '#slim_p4_10':
-				self::show_spy_view('p0', -1);
+				self::show_spy_view($ajax_box_id, -1);
 				break;
 			case '#slim_p4_11':
-				self::show_results('popular', 'p0', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('tci.content_type = "post"'), 'custom_where' => 'tci.content_type = "post"'));
+				self::show_results('popular', $ajax_box_id, 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('tci.content_type = "post"'), 'custom_where' => 'tci.content_type = "post"'));
 				break;
 			case '#slim_p4_12':
-				self::show_results('popular', 'p0', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'), 'custom_where' => '(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'));
+				self::show_results('popular', $ajax_box_id, 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'), 'custom_where' => '(t1.resource LIKE "%/feed%" OR t1.resource LIKE "%?feed=%" OR t1.resource LIKE "%&feed=%" OR tci.content_type LIKE "%feed%")'));
 				break;
 			case '#slim_p4_13':
-				self::show_results('popular', 'p0', 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'), 'custom_where' => '(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'));
+				self::show_results('popular', $ajax_box_id, 'searchterms', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'), 'custom_where' => '(t1.resource = "__l_s__" OR t1.resource = "" OR tci.content_type LIKE "%search%")'));
 				break;
 			case '#slim_p4_15':
-				self::show_results('recent', 'p0', 'resource', array('custom_where' => '(tci.content_type = "category" OR tci.content_type = "tag")', 'join_tables' => 'tci.*'));
+				self::show_results('recent', $ajax_box_id, 'resource', array('custom_where' => '(tci.content_type = "category" OR tci.content_type = "tag")', 'join_tables' => 'tci.*'));
 				break;
 			case '#slim_p4_16':
-				self::show_results('popular', 'p0', 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'), 'custom_where' => '(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'));
+				self::show_results('popular', $ajax_box_id, 'resource', array('total_for_percentage' => wp_slimstat_db::count_records('(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'), 'custom_where' => '(t1.resource LIKE "[404]%" OR tci.content_type LIKE "%404%")'));
 				break;
 			case '#slim_p4_18':
-				self::show_results('popular', 'p0', 'author', array('total_for_percentage' => wp_slimstat_db::count_records('tci.author <> ""')));
+				self::show_results('popular', $ajax_box_id, 'author', array('total_for_percentage' => wp_slimstat_db::count_records('tci.author <> ""')));
 				break;
 			case '#slim_p4_19':
-				self::show_results('popular', 'p0', 'category', array('total_for_percentage' => wp_slimstat_db::count_records('(tci.content_type LIKE "%tag%")'), 'custom_where' => '(tci.content_type LIKE "%tag%")', 'more_columns' => ',tci.category'));
+				self::show_results('popular', $ajax_box_id, 'category', array('total_for_percentage' => wp_slimstat_db::count_records('(tci.content_type LIKE "%tag%")'), 'custom_where' => '(tci.content_type LIKE "%tag%")', 'more_columns' => ',tci.category'));
 				break;
 			case '#slim_p4_20':
-				self::show_spy_view('p0', 1);
+				self::show_spy_view($ajax_box_id, 1);
 				break;
 			default:
 		}
-		die();
+		if (!empty($_POST['box_id'])) die();
 	}
 }

@@ -41,7 +41,6 @@ switch ($current_tab){
 		}
 		break;
 	case 2:
-		
 		$options_on_this_page = array(
 			'convert_ip_addresses' => array('description' => __('Convert IP Addresses','wp-slimstat'), 'type' => 'yesno', 'long_description' => __('View hostnames instead of IP addresses. It slows down the rendering of your metrics.','wp-slimstat')),
 			'async_load' => array('description' => __('Asynchronous Views','wp-slimstat'), 'type' => 'yesno', 'long_description' => __('Use Ajax to load all the stats at runtime. It makes the panels show up faster, but it increases the load on your server.','wp-slimstat')),
@@ -52,7 +51,9 @@ switch ($current_tab){
 			'ip_lookup_service' => array('description' => __('IP Lookup','wp-slimstat'), 'type' => 'text', 'long_description' => __('Customize the IP lookup service URL.','wp-slimstat')),
 			'refresh_interval' => array('description' => __('Refresh Every','wp-slimstat'), 'type' => 'integer', 'long_description' => __('Refresh the Right Now screen every X seconds. Zero disables this feature.','wp-slimstat')),
 			'hide_stats_link_edit_posts' => array('description' => __('Hide Stats Link','wp-slimstat'), 'type' => 'yesno', 'long_description' => __('Enable this option if your users are confused by the Stats link associate to each post in the Edit Posts page.','wp-slimstat')),
+			'custom_css' => array('description' => __('Custom CSS','wp-slimstat'), 'type' => 'textarea', 'long_description' => __("Paste here your custom stylesheet definitions, to personalize the way your reports look, including color-coded pageviews, font sizes, etc.",'wp-slimstat')),
 			'markings' => array('description' => __('Chart Annotations','wp-slimstat'), 'type' => 'textarea', 'long_description' => __("Add <em>markings</em> to each chart by specifying a date and its description in the field below. Useful to keep track of special events and correlate them to your analytics. Please use the following format:<code>YYYY MM DD HH:mm=Description 1,YYYY MM DD HH:mm=Description 2</code>. For example: 2012 12 31 23:55=New Year's Eve.",'wp-slimstat'))
+
 		);
 		break;
 	case 3:

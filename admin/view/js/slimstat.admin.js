@@ -44,12 +44,11 @@ var SlimStatAdmin = {
 				noColumns: 4
 			}
 		};
-		previous_point = null;
-		
-		jQuery.plot(SlimStatAdmin._placeholder, SlimStatAdmin.data, SlimStatAdmin._chart_options);
+		var previous_point = null;
 
+		jQuery.plot(SlimStatAdmin._placeholder, SlimStatAdmin.data, SlimStatAdmin._chart_options);
 		SlimStatAdmin.chart_color_weekends();
-		
+
 		SlimStatAdmin._placeholder.bind('plothover', function(event, pos, item){
 			if (item){
 				if (typeof item.series.label != 'undefined'){

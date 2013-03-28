@@ -27,7 +27,7 @@ class wp_slimstat_db {
 		// Decimal and thousand separators
 		if (wp_slimstat::$options['use_european_separators'] == 'no'){
 			self::$formats['decimal'] = '.';
-			self::$formats['thousand'] = ',';	
+			self::$formats['thousand'] = ',';
 		}
 
 		// Use WordPress' settings for date and time format
@@ -254,9 +254,9 @@ class wp_slimstat_db {
 		return intval($GLOBALS['wpdb']->get_var('
 			SELECT COUNT(*) count
 				FROM (
-					SELECT resource
-					FROM '.self::$filters['sql_from']['all'].'
-					WHERE visit_id <> 0 AND resource <> "__l_s__" AND resource <> "" '.self::$filters['sql_where'].' '.self::$filters['date_sql_where'].'
+					SELECT t1.resource
+					FROM '.self::$filters['sql_from']['all'].' '.self::_add_filters_to_sql_from('tci.content_type').'
+					WHERE t1.visit_id <> 0 AND t1.resource <> "__l_s__" AND t1.resource <> "" AND tci.content_type <> "404" '.self::$filters['sql_where'].' '.self::$filters['date_sql_where'].'
 					GROUP BY visit_id
 					HAVING COUNT(visit_id) = 1
 				) as ts1'));
@@ -318,11 +318,11 @@ class wp_slimstat_db {
 			) AS ts1', ARRAY_A);
 	}
 
-	public static function get_oldest_visit($_order = 'ASC'){
+	public static function get_oldest_visit(){
 		return $GLOBALS['wpdb']->get_var('
 			SELECT t1.dt
 			FROM '.$GLOBALS['wpdb']->prefix."slim_stats t1
-			ORDER BY t1.dt $_order
+			ORDER BY t1.dt ASC
 			LIMIT 0,1");
 	}
 
@@ -375,13 +375,6 @@ class wp_slimstat_db {
 	}
 
 	public static function get_popular($_column = 't1.id', $_custom_where = '', $_more_columns = '', $_having_clause = '', $_as_column = ''){
-echo "
-			SELECT $_column ".(!empty($_as_column)?'AS '.$_as_column:'')." $_more_columns, COUNT(*) count
-			FROM ".self::$filters['sql_from']['all'].' '.self::_add_filters_to_sql_from($_column.$_custom_where.$_more_columns).'
-			WHERE '.(empty($_custom_where)?"$_column <> '' AND  $_column <> '__l_s__'":$_custom_where).' '.self::$filters['sql_where'].' '.self::$filters['date_sql_where']."
-			GROUP BY $_column $_more_columns $_having_clause
-			ORDER BY count ".self::$filters['parsed']['direction'][1]."
-			LIMIT ".self::$filters['parsed']['starting'][1].', '.self::$filters['parsed']['limit_results'][1];
 		return $GLOBALS['wpdb']->get_results("
 			SELECT $_column ".(!empty($_as_column)?'AS '.$_as_column:'')." $_more_columns, COUNT(*) count
 			FROM ".self::$filters['sql_from']['all'].' '.self::_add_filters_to_sql_from($_column.$_custom_where.$_more_columns).'
@@ -644,6 +637,8 @@ echo "
 				default:
 			}
 		}
+
+		self::$filters = apply_filters('slimstat_reporting_filters', self::$filters);
 	}	
 
 	protected function _format_value($_value = 0, $_link = ''){

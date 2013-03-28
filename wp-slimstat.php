@@ -52,25 +52,30 @@ class wp_slimstat{
 	public static function slimtrack_js(){
 		$data_string = base64_decode($_REQUEST['data']);
 		if ($data_string === false){
+			do_action('slimstat_track_exit_101');
 			exit('-101.0');
 		}
 
 		// Parse the information we received
 		parse_str($data_string, self::$data_js);
+		self::$data_js = apply_filters('slimstat_filter_pageview_data_js', self::$data_js);
 
 		if (empty(self::$data_js['ci']) && empty(self::$data_js['id'])){
+			do_action('slimstat_track_exit_102');
 			exit('-102.0');
 		}
 
 		if (!empty(self::$data_js['ci'])){
 			list(self::$data_js['ci'], $nonce) = explode('.', self::$data_js['ci']);
 			if ($nonce != md5(self::$data_js['ci'].self::$options['secret'])){
+				do_action('slimstat_track_exit_103');
 				exit('-103.0');
 			}
 		}
 		else{
 			list(self::$data_js['id'], $nonce) = explode('.', self::$data_js['id']);
 			if ($nonce != md5(self::$data_js['id'].self::$options['secret'])){
+				do_action('slimstat_track_exit_104');
 				exit('-104.0');
 			}
 			self::$stat['id'] = self::$data_js['id'];
@@ -92,9 +97,9 @@ class wp_slimstat{
 				if (!empty($timezone)) date_default_timezone_set('UTC');
 				self::$stat['dt'] = mktime($lt[2], $lt[1], $lt[0], $lt[4]+1, $lt[3], $lt[5]+1900);
 
-				$GLOBALS['wpdb']->query($GLOBALS['wpdb']->prepare("
-					INSERT IGNORE INTO {$GLOBALS['wpdb']->prefix}slim_outbound (".implode(', ', array_keys(self::$stat)).')
-					VALUES ('.substr(str_repeat('%s,', count(self::$stat)), 0, -1).')', self::$stat));
+				self::insert_row(self::$stat, $GLOBALS['wpdb']->prefix.'slim_outbound');
+
+				do_action('slimstat_track_success_outbound');
 				exit(self::$stat['id'].'.'.md5(self::$stat['id'].self::$options['secret']));
 			}
 		}
@@ -105,25 +110,10 @@ class wp_slimstat{
 			'colordepth' => !empty(self::$data_js['cd'])?self::$data_js['cd']:'',
 			'antialias' => !empty(self::$data_js['aa'])?intval(self::$data_js['aa']):0
 		);
+		$screenres = apply_filters('slimstat_filter_pageview_screenres', $screenres, self::$stat);
 
 		// Now we insert the new screen resolution in the lookup table, if it doesn't exist
-		$select_sql = $GLOBALS['wpdb']->prepare("
-			SELECT screenres_id
-			FROM {$GLOBALS['wpdb']->base_prefix}slim_screenres
-			WHERE resolution = %s AND colordepth = %s AND antialias = %s
-			LIMIT 1", $screenres['resolution'], $screenres['colordepth'], $screenres['antialias']);
-
-		self::$stat['screenres_id'] = $GLOBALS['wpdb']->get_var($select_sql);
-		if ( empty(self::$stat['screenres_id']) ){
-			$GLOBALS['wpdb']->query($GLOBALS['wpdb']->prepare("
-				INSERT IGNORE INTO {$GLOBALS['wpdb']->base_prefix}slim_screenres (".implode(', ', array_keys($screenres)).')
-				VALUES ('.substr(str_repeat('%s,', count($screenres)), 0, -1).')', $screenres));
-			self::$stat['screenres_id'] = $GLOBALS['wpdb']->insert_id;
-
-			if ( empty(self::$stat['screenres_id']) ) { // This can happen if another transaction added the new screen resolution in the meanwhile
-				self::$stat['screenres_id'] = $GLOBALS['wpdb']->get_var($select_sql);
-			}
-		}
+		self::$stat['screenres_id'] = self::maybe_insert_row($screenres, $GLOBALS['wpdb']->base_prefix.'slim_screenres', 'screenres_id');
 		self::$stat['plugins'] = !empty(self::$data_js['pl'])?substr(str_replace('|', ',', self::$data_js['pl']), 0, -1):'';
 
 		// If Javascript mode is enabled, record this pageview
@@ -141,10 +131,12 @@ class wp_slimstat{
 
 		// Was this pageview tracked?
 		if (self::$stat['id'] < 0){
+			do_action('slimstat_track_exit_'.abs(self::$stat['id']));
 			exit(self::$stat['id'].'.0');
 		}
 
 		// Send the ID back to Javascript to track future interactions
+		do_action('slimstat_track_success');
 		exit(self::$stat['id'].'.'.md5(self::$stat['id'].self::$options['secret']));
 	}
 
@@ -252,7 +244,7 @@ class wp_slimstat{
 
 			// This must be a 'seriously malformed' URL
 			if (!$referer){
-				self::$stat['id'] = -215;
+				self::$stat['id'] = -208;
 				return $_argument;
 			}
 			
@@ -304,12 +296,6 @@ class wp_slimstat{
 			self::$stat['resource'] = ''; // Mark the resource to remember that this is a 'local search'
 		}
 		//self::$stat['resource'] = htmlentities(self::$stat['resource'], ENT_QUOTES, 'UTF-8');
-
-		// Do not track the script itself
-		if (strpos(self::$stat['resource'], 'wp-slimstat-js.php') !== false){
-			self::$stat['id'] = -208;
-			return $_argument;
-		}
 
 		// Is this resource blacklisted?
 		if (!empty(self::$stat['resource'])){
@@ -372,23 +358,21 @@ class wp_slimstat{
 		}
 
 		// Now let's save this information in the database
-		if (!empty($content_info)){
-			self::$stat['content_info_id'] = self::maybe_insert_row($content_info, $GLOBALS['wpdb']->base_prefix.'slim_content_info', 'content_info_id');
-		}
-
+		if (!empty($content_info)) self::$stat['content_info_id'] = self::maybe_insert_row($content_info, $GLOBALS['wpdb']->base_prefix.'slim_content_info', 'content_info_id');
 		self::$stat['browser_id'] = self::maybe_insert_row($browser, $GLOBALS['wpdb']->base_prefix.'slim_browsers', 'browser_id');
-
 		self::$stat['id'] = self::insert_row(self::$stat, $GLOBALS['wpdb']->prefix.'slim_stats');
 
 		// Is this a new visitor?
-		if (empty(self::$stat['visit_id']) && !empty(self::$stat['id'])){
-			// Set a cookie to track this visit (Google and other non-human engines will just ignore it)
-			@setcookie('slimstat_tracking_code', self::$stat['id'].'id.'.md5(self::$stat['id'].'id'.self::$options['secret']), time()+2678400, COOKIEPATH); // one month
+		$is_set_cookie = apply_filters('slimstat_set_visit_cookie', true);
+		if ($is_set_cookie){
+			if (empty(self::$stat['visit_id']) && !empty(self::$stat['id'])){
+				// Set a cookie to track this visit (Google and other non-human engines will just ignore it)
+				@setcookie('slimstat_tracking_code', self::$stat['id'].'id.'.md5(self::$stat['id'].'id'.self::$options['secret']), time()+2678400, COOKIEPATH); // one month
+			}
+			elseif (!$cookie_has_been_set && self::$options['extend_session'] == 'yes' && self::$stat['visit_id'] > 0){
+				@setcookie('slimstat_tracking_code', self::$stat['visit_id'].'.'.md5(self::$stat['visit_id'].self::$options['secret']), time()+self::$options['session_duration'], COOKIEPATH);
+			}
 		}
-		elseif (!$cookie_has_been_set && self::$options['extend_session'] == 'yes' && self::$stat['visit_id'] > 0){
-			@setcookie('slimstat_tracking_code', self::$stat['visit_id'].'.'.md5(self::$stat['visit_id'].self::$options['secret']), time()+self::$options['session_duration'], COOKIEPATH);
-		}
-
 		return $_argument;
 	}
 	// end slimtrack
@@ -605,9 +589,9 @@ class wp_slimstat{
 		}
 
 		// If a meaningful match was found, let's define some keys
-		if ($search[5] != 'Default Browser' && $search[5] != 'unknown' & intval($search[6]) != 0){
+		if ($search[5] != 'Default Browser' && $search[5] != 'unknown'){
 			$browser['browser'] = $search[5];
-			$browser['version'] = $search[6];
+			$browser['version'] = intval($search[6]);
 			$browser['platform'] = strtolower($search[9]);
 			$browser['css_version'] = $search[28];
 
@@ -849,7 +833,9 @@ class wp_slimstat{
 			self::$stat['visit_id']++;
 			update_option('slimstat_visit_id', self::$stat['visit_id']);
 
-			@setcookie('slimstat_tracking_code', self::$stat['visit_id'].'.'.md5(self::$stat['visit_id'].self::$options['secret']), time()+self::$options['session_duration'], COOKIEPATH);
+			$is_set_cookie = apply_filters('slimstat_set_visit_cookie', true);
+			if ($is_set_cookie)
+				@setcookie('slimstat_tracking_code', self::$stat['visit_id'].'.'.md5(self::$stat['visit_id'].self::$options['secret']), time()+self::$options['session_duration'], COOKIEPATH);
 		}
 		elseif ($identifier > 0){
 			self::$stat['visit_id'] = $identifier;
@@ -962,6 +948,8 @@ class wp_slimstat{
 			'enable_cdn' => 'no'
 		);
 
+		self::$options = apply_filters('slimstat_init_options', self::$options);
+
 		// Save these options in the database
 		add_option('slimstat_options', self::$options, '', 'no');
 	}
@@ -972,9 +960,9 @@ class wp_slimstat{
 	 */
 	public static function wp_slimstat_enqueue_tracking_script(){
 		if (self::$options['enable_cdn'] == 'yes')
-			wp_register_script('wp_slimstat', 'http://cdn.jsdelivr.net/wp-slimstat/'.self::$options['version'].'/wp-slimstat.js', array(), self::$version, true);
+			wp_register_script('wp_slimstat', 'http://cdn.jsdelivr.net/wp-slimstat/'.self::$options['version'].'/wp-slimstat.js', array(), null, true);
 		else
-			wp_register_script('wp_slimstat', plugins_url('/wp-slimstat.js', __FILE__), array(), self::$version, true);
+			wp_register_script('wp_slimstat', plugins_url('/wp-slimstat.js', __FILE__), array(), null, true);
 
 		wp_enqueue_script('wp_slimstat');
 
@@ -996,6 +984,8 @@ class wp_slimstat{
 		if (!empty(self::$options['extensions_to_track'])){
 			$params['extensions_to_track'] = self::$options['extensions_to_track'];
 		}
+		
+		$params = apply_filters('slimstat_js_params', $params);
 
 		wp_localize_script('wp_slimstat', 'SlimStatParams', $params);
 	}
