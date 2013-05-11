@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: chart, analytics, visitors, users, spy, shortstat, tracking, reports, seo, referers, analyze, wassup, geolocation, online users, spider, tracker, pageviews, world map, stats, maxmind, flot, stalker, statistics, google+, monitor, seo
 Requires at least: 3.1
 Tested up to: 3.6
-Stable tag: 3.2
+Stable tag: 3.2.1
 
 == Description ==
 A powerful real-time web analytics plugin for Wordpress. Visit the [official site](http://slimstat.getused.to.it/) for more information.
@@ -265,8 +265,14 @@ foreach ($results...`
 
 == Changelog ==
 
+= 3.2.1 =
+* Updated: strengthened the plugin's controls on the database structure, and improved error handling for some rare issues that could arise (thank you, Vera)
+* Updated: removed License Key field from free add-ons listed under the corresponding screen (sorry for the confusion)
+* Fixed: a bug was resetting all the settings on deactivation/reactivation (thank you, [Jeremy](http://wordpress.org/support/topic/deactivatereactivate-plugin-resets-its-settings))
+* Fixed: a permission issue on the new Add-ons page (thank you, [daaab](http://wordpress.org/support/topic/bought-user-overview-add-on-but-failed-to-enter-license-key))
+
 = 3.2 =
-* Added: we released the first few premium add-ons for WP SlimStat. You can now enhance its geolocation interface by getting more in-depth details about your visitors, or see what your registered users are doing on your site. (Check them out)[http://slimstat.getused.to.it]!
+* Added: we released the first few premium add-ons for WP SlimStat. You can now enhance its geolocation interface by getting more in-depth details about your visitors, or see what your registered users are doing on your site. [Check them out](http://slimstat.getused.to.it)!
 * Added: new option to disable the detection of your visitors' browsers anti-aliasing support (thank you, [masspamak](http://wordpress.org/support/topic/remove-the-html5-canvas-element))
 * Added: you can now refresh single reports, instead of reloading the entire page
 * Updated: SlimStat's event tracking functionality has been updated to include [Sarah's feedback](http://wordpress.org/support/topic/event-tracking-page-page-load-not-working) on jQuery events
@@ -313,20 +319,6 @@ foreach ($results...`
 * Fixed: bug in filtering Top Pages (thank you, [TechnoViel](http://wordpress.org/support/topic/slimstat-showing-old-hits-in-current-month-day-but-not-when-filtering-by-page))
 * Launched: [WP SlimStat](http://slimstat.getused.to.it/) official website is now live (and growing)
 
-= 2.9.5 =
-* Fixed: vulnerability that would allow visitors to inject javascript code into the admin, under specific circumstances (thank you, [mikes88](http://wordpress.org/support/topic/sanitize-the-plugin))
-
-= 2.9.4 =
-* Fixed: bug that prevented the 'Limit Results' option from working properly (thank you, Romain Petges)
-* Fixed: a bug was preventing those users who were using the Refresh Interval feature from visualizing the stats
-* Fixed: a bug affecting the filter on browsers and operating system in the Right Now tab (thank you, Davide)
-* Updated: some new SQL optimizations have been implemented
-
-= 2.9.3 =
-* Updated: SQL optimizations have been implemented in the core DB APIs, your stats should now load a little faster
-* Fixed: minor bugs in the core tracking functionality, affecting the way tags associated to posts were recorded (thank you, [Neil](http://wordpress.org/support/topic/categories-vs-tags) and [Davide](http://www.davidetomasello.it/))
-* Updated: ip geolocation database (February 2013). Go to Settings > SlimStat > Maintenance tab > Update Geolocation DB to load the new data.
-
 == Donors ==
 [7times77](http://7times77.com),
 [Andrea Pinti](http://andreapinti.com),
@@ -352,7 +344,7 @@ Neil Robinson,
 [Sahin Eksioglu](http://www.alternatifblog.com),
 [Saill White](http://saillwhite.com),
 [Sarah Parks](http://drawingsecretsrevealed.com),
-Sebastian Peschties,
+[Sebastian Peschties](http://www.spitl.de),
 [Sharon Villines](http://sociocracy.info), 
 [SpenceDesign](http://spencedesign.com),
 Stephane Sinclair,
