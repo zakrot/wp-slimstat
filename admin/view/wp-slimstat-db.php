@@ -226,6 +226,7 @@ class wp_slimstat_db {
 			case 'css_version':
 			case 'type':
 			case 'platform':
+			case 'user_agent':
 				return 'tb.';
 				break;
 			case 'resolution':
@@ -617,6 +618,7 @@ class wp_slimstat_db {
 				case 'plugins':
 				case 'version':
 				case 'type':
+				case 'user_agent':
 				case 'colordepth':
 				case 'css_version':
 				case 'notes':
@@ -632,7 +634,7 @@ class wp_slimstat_db {
 				case 'day':
 				case 'month':
 				case 'year':
-					self::$filters['parsed'][$a_match] = array(isset($matches[2][$idx])?$matches[2][$idx]:'equals', isset($matches[3][$idx])?$GLOBALS['wpdb']->escape(str_replace('\\', '', htmlspecialchars_decode($matches[3][$idx]))):'');
+					self::$filters['parsed'][$a_match] = array(isset($matches[2][$idx])?$matches[2][$idx]:'equals', isset($matches[3][$idx])?esc_sql(str_replace('\\', '', htmlspecialchars_decode($matches[3][$idx]))):'');
 					break;
 				default:
 			}

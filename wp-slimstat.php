@@ -3,7 +3,7 @@
 Plugin Name: WP SlimStat
 Plugin URI: http://wordpress.org/extend/plugins/wp-slimstat/
 Description: A powerful real-time web analytics plugin for Wordpress.
-version: 3.2.4
+version: 3.2.6
 Author: Camu
 Author URI: http://slimstat.getused.to.it/
 */
@@ -11,7 +11,7 @@ Author URI: http://slimstat.getused.to.it/
 if (!empty(wp_slimstat::$options)) return true;
 
 class wp_slimstat{
-	public static $version = '3.2.4';
+	public static $version = '3.2.6';
 	public static $options = array();
 	
 	protected static $data_js = array('id' => -1);
@@ -350,7 +350,7 @@ class wp_slimstat{
 		// Is this browser blacklisted?
 		foreach(self::string_to_array(self::$options['ignore_browsers']) as $a_filter){
 			$pattern = str_replace( array('\*', '\!') , array('(.*)', '.'), preg_quote($a_filter, '/'));
-			if (preg_match("~^$pattern$~i", self::$browser['browser'].'/'.self::$browser['version']) || (preg_match("~^$pattern$~i", self::$browser['browser']))){
+			if (preg_match("~^$pattern$~i", self::$browser['browser'].'/'.self::$browser['version']) || preg_match("~^$pattern$~i", self::$browser['browser']) || preg_match("~^$pattern$~i", self::$browser['user_agent'])){
 				self::$stat['id'] = -212;
 				return $_argument;
 			}
@@ -632,6 +632,7 @@ class wp_slimstat{
 			$browser['version'] = intval($search[6]);
 			$browser['platform'] = strtolower($search[9]);
 			$browser['css_version'] = $search[28];
+			$browser['user_agent'] = $user_agent;
 
 			// browser Types:
 			//		0: regular
@@ -642,7 +643,7 @@ class wp_slimstat{
 			elseif ($search[26] == 'true') $browser['type'] = 3;
 			elseif ($search[27] != 'true') $browser['type'] = 0;
 
-			return $browser;
+			if ($browser['version'] != 0 || $browser['type'] != 0) return $browser;
 		}
 
 		// Let's try with the heuristic approach
@@ -740,7 +741,8 @@ class wp_slimstat{
 		// Google Chrome browser on all platforms with or without language string
 		} elseif (preg_match('#^Mozilla/\d+\.\d+\s(?:[A-Za-z0-9\./]+\s)?\((?:([A-Za-z0-9/\.]+);(?:\sU;)?\s?)?([^;]*)(?:;\s[A-Za-z]{3}64)?;?\s?([a-z]{2}(?:\-[A-Za-z]{2})?)?\)\sAppleWebKit/[0-9\.]+\+?\s\((?:KHTML,\s)?like\sGecko\)(?:\s([A-Za-z0-9_\-]+[^i])/([A-Za-z0-9\.]+)){1,3}(?:\sSafari/[0-9\.]+)?$#', $user_agent, $match)>0){
 			$browser['browser'] = $match[4];
-			$browser['version'] = $match[5];
+			$browser['version'] = intval($match[5]);
+
 			if (empty($match[2]))
 				$os = $match[1];
 			else
@@ -1004,7 +1006,8 @@ class wp_slimstat{
 		$response = @wp_remote_get($request, $options);
 
 		if (!is_wp_error($response) && isset($response['response']['code']) && ($response['response']['code'] == 200) && !empty($response['body'])){
-			echo json_decode($response['body']);
+			$ad_response = @json_decode($response['body']);
+			if (!is_null($ad_response) && !empty($ad_response->content)) echo $ad_response->content;
 		}
 		return 0;
 	}

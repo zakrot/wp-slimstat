@@ -154,6 +154,7 @@ class wp_slimstat_admin{
 				platform VARCHAR(15) DEFAULT '',
 				css_version VARCHAR(5) DEFAULT '',
 				type TINYINT UNSIGNED DEFAULT 0,
+				user_agent VARCHAR(2048) DEFAULT '',
 				PRIMARY KEY (browser_id),
 				UNIQUE KEY unique_browser (browser, version, platform, css_version, type)
 			) COLLATE utf8_general_ci $use_innodb";
@@ -295,7 +296,7 @@ class wp_slimstat_admin{
 		}
 
 		$content_id_exists = false;
-		$table_structure = $GLOBALS['wpdb']->get_results("SHOW COLUMNS FROM {$GLOBALS['wpdb']->prefix}slim_content_info", ARRAY_A);
+		$table_structure = $GLOBALS['wpdb']->get_results("SHOW COLUMNS FROM {$GLOBALS['wpdb']->base_prefix}slim_content_info", ARRAY_A);
 
 		foreach($table_structure as $a_row){
 			if ($a_row['Field'] == 'content_id'){
@@ -323,7 +324,7 @@ class wp_slimstat_admin{
 		// --- END: Updates for version 3.0 ---
 		
 		// --- Updates for version 3.1 ---
-		$GLOBALS['wpdb']->query("DROP TABLE IF EXISTS {$GLOBALS['wpdb']->prefix}slim_countries");
+		$GLOBALS['wpdb']->query("DROP TABLE IF EXISTS {$GLOBALS['wpdb']->base_prefix}slim_countries");
 		// --- END: Updates for version 3.1 ---
 		
 		// --- Updates for version 3.2 ---
@@ -335,6 +336,21 @@ class wp_slimstat_admin{
 		}
 		// --- END: Updates for version 3.2 ---
 
+		// --- Updates for version 3.2.6 ---
+		$user_agent_exists = false;
+		$table_structure = $GLOBALS['wpdb']->get_results("SHOW COLUMNS FROM {$GLOBALS['wpdb']->base_prefix}slim_browsers", ARRAY_A);
+
+		foreach($table_structure as $a_row){
+			if ($a_row['Field'] == 'user_agent'){
+				$user_agent_exists = true;
+				break;
+			}
+		}
+		if (!$user_agent_exists){
+			$GLOBALS['wpdb']->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers ADD COLUMN user_agent VARCHAR(2048) DEFAULT '' AFTER type");
+		}
+		// --- END: Updates for version 3.2.6 ---
+		
 		// New option 'version' added in version 2.8 - Keep it up-to-date
 		if (!isset(wp_slimstat::$options['version']) || wp_slimstat::$options['version'] != wp_slimstat::$version){
 			self::update_option('version', wp_slimstat::$version, 'text');
