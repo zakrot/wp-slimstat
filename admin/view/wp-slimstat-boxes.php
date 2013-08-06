@@ -900,6 +900,7 @@ class wp_slimstat_boxes{
 				self::show_spy_view($ajax_box_id, 1);
 				break;
 			case '#slim_p7_02':
+				$using_screenres = wp_slimstat_admin::check_screenres();
 				include_once(WP_PLUGIN_DIR."/wp-slimstat/admin/view/right-now.php");
 				break;
 			default:

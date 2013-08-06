@@ -354,8 +354,8 @@ foreach ( array(
 						<p class="nodata"><?php _e('No data to display','wp-slimstat') ?></p>
 					</div>
 				</div>
-				<script src="<?php echo plugins_url('/view/js/ammap/ammap.js', dirname(__FILE__)) ?>" type="text/javascript"></script>
-				<script src="<?php echo plugins_url('/view/js/ammap/world.js', dirname(__FILE__)) ?>" type="text/javascript"></script>
+				<script src="<?php echo plugins_url('/js/ammap/ammap.js', dirname(__FILE__)) ?>" type="text/javascript"></script>
+				<script src="<?php echo plugins_url('/js/ammap/world.js', dirname(__FILE__)) ?>" type="text/javascript"></script>
 				<script type="text/javascript">
 				AmCharts.ready(function(){
 					var dataProvider = {
@@ -386,7 +386,7 @@ foreach ( array(
 					map.balloon.color = "#000000";
 					map.colorSteps = 20;
 					map.mouseWheelZoomEnabled = true;
-					map.pathToImages = "<?php echo plugins_url('/view/js/ammap/images/', dirname(__FILE__)) ?>";
+					map.pathToImages = "<?php echo plugins_url('/js/ammap/images/', dirname(__FILE__)) ?>";
 					map.valueLegend = legend;
 					
 					// Init Data
