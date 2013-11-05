@@ -3,19 +3,32 @@ Contributors: coolmann
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BNJR5EZNY3W38
 Tags: chart, analytics, visitors, users, spy, shortstat, tracking, reports, seo, referers, analyze, wassup, geolocation, online users, spider, tracker, pageviews, world map, stats, maxmind, flot, stalker, statistics, google+, monitor, seo
 Requires at least: 3.2
-Tested up to: 3.6
-Stable tag: 3.3.4
+Tested up to: 3.7
+Stable tag: 3.4.1
 
 == Description ==
 A powerful real-time web analytics plugin for WordPress. Visit our [official site](http://slimstat.getused.to.it/) for more information.
 
-= Main Features =
+= Key Features =
 * Real-time web analytics reports
 * Compatible with W3 Total Cache, WP SuperCache, HyperCache and friends
 * Modern, easy to use and customizable interface (yep, you can move reports around and hide the ones you don't need)
 * The most accurate IP geolocation, browser and platform detection ever seen (courtesy of [MaxMind](http://www.maxmind.com/) and [Browscap](http://tempdownloads.browserscap.com/))
 * Advanced filtering
 * World Map that works on your mobile device, too (courtesy of [amMap](http://www.ammap.com/)).
+
+= Available in multiple languages =
+* English
+* Chinese
+* Farsi
+* French
+* German
+* Italian
+* Portuguese
+* Russian
+* Spanish
+* Swedish
+* Your language is missing or incomplete? [Contact Us](http://slimstat.getused.to.it/contact-us/) to share your localization!
 
 = What are people saying about WP SlimStat? =
 * One of the 15+ Cool Free SEO Plugins for WordPress - [udesign](http://www.pixeldetail.com/wordpress/free-seo-plugins-for-wordpress/)
@@ -29,7 +42,7 @@ A powerful real-time web analytics plugin for WordPress. Visit our [official sit
 * MySQL 5.0.3+
 * At least 5 MB of free web space
 * At least 5 MB of free DB space
-* At least 5 Mb of free memory for the tracker
+* At least 10 Mb of free memory for the tracker
 
 = Browser Compatibility =
 WP SlimStat uses the HTML5 Canvas element and SVG graphics to display its charts and the world map. Unfortunately Internet Explorer 8 and older versions don't support them, so you're encouraged to upgrade your browser.
@@ -161,14 +174,14 @@ Just write a function that gets the results and displays them, making sure to us
 	$sql = "SELECT ...";
 	$results = $wpdb->get_results($sql, ARRAY_A);
 
-	// Boxes come in three sizes: wide, medium, normal (default).
-	wp_slimstat_boxes:box_header('my_custom_box_id', 'My Custom Box Inline Help', 'medium', false, '', 'My cool report');
+	// Reports come in three sizes: wide, medium, normal (default).
+	wp_slimstat_reports:report_header('my_custom_report_id', 'My Custom Report Inline Help', 'medium', false, '', 'My cool report');
 
 	foreach($results as $a_result){
 		echo "<p>{$a_result['resource']} <span>{$a_result['countresults']}</span></p>";
 	}
 	
-	wp_slimstat_boxes:box_footer(); // closes the DIV's open by box_header
+	wp_slimstat_reports:report_footer();
 }`
 
 Then let WP SlimStat know about it:
@@ -219,11 +232,13 @@ You will need to edit your template and add something like this where you want y
 `// Load WP SlimStat DB, the API library exposing all the reports
 require_once(WP_PLUGIN_DIR.'/wp-slimstat/admin/view/wp-slimstat-db.php');
 
-// Initialize the API. You can pass a filter in the options, i.e. show only hits by people who where using Firefox, any version
-wp_slimstat_db::init('browser contains Firefox');
+// Initialize the API. You can pass a filter in the options, i.e. show only hits by people who where using Firefox (any version) *and* visiting 'posts':
+wp_slimstat_db::init('browser contains Firefox|content_type equals post');
 
 // Use the appropriate method to display your stats
 echo wp_slimstat_db::count_records('1=1', '*', false);`
+
+You can list more than one filter by using the pipe char | to separate them (which is evaluated as AND among the filters).
 
 *Available methods*
 
@@ -248,7 +263,7 @@ echo wp_slimstat_db::count_records('1=1', '*', false);`
 
 Recent Posts: 
 
-`wp_slimstat_db::init('content_type equals post');
+`wp_slimstat_db::init('content_type equals post|visit_id');
 $results = wp_slimstat_db::get_recent('t1.resource');
 foreach ($results...`
 
@@ -267,6 +282,41 @@ foreach ($results...`
 5. Access your stats from within WordPress for iOS
 
 == Changelog ==
+
+= 3.4.1 =
+* [New] Report to visualize top Outbound Links and Downloads (thank you, [bobinoz](http://wordpress.org/support/topic/tracking-outbound-links-1))
+* [New] Purge data by user agent (thank you, [GermanKiwi](http://wordpress.org/support/topic/purge-data-based-on-user-agent))
+* [New] Import/Export all your settings in a text file. Go to Settings > Maintenance and give it a try! (thank you, [Mike](http://wordpress.org/support/topic/feature-request-save-out-settings))
+* [Update] Cosmetic updates to the interface
+* [Update] Right Now Extended is now set to 'No' by default
+* [Fix] Filters were not being reset if API was invoked more than once on the same page (thank you, [PV-Patrick](http://wordpress.org/support/topic/api-calls-in-the_loop))
+* [Fix] Compatibility issues with User Overview (thank you, Thorsten)
+* [Fix] Bug affecting the data recorded when URLs were using non-ASCII characters (thank you, [dimitrios1988](http://wordpress.org/support/topic/stats-now-showing-in-non-ascii-characters))
+* [Fix] Compatibility issues with Export to Excel
+* [Fix] Bug related to the new HTTP POST-based Filtering system
+* [Fix] Issue with French localization encoding (thank you [whoaloic](http://wordpress.org/support/topic/foreign-language-encoding-issue))
+* [Fix] Elaborated on how to use multiple filters with the API (thank you, [Statistiker](http://wordpress.org/support/topic/filter-most-popular-posts))
+
+= 3.4 =
+* [Note] We can't believe we're already crossing the 600,000 downloads mark! To celebrate this accomplishment, we're working on a brand new website! Stay tuned.
+* [New] Local IP Addresses are now marked as such (thank you, [Thorsten](http://wordpress.org/support/topic/wrong-geolocation-for-rfc-1918-private-ip-ranges))
+* [Update] SlimStat's filters have been reimplemented to use HTTP POST requests, in order to avoid issues with very long URIs (thank you, John)
+* [Update] You can now restrict access to the configuration screens by specifying the minimum capability required (default: activate_plugins)
+* [Update] Localization files have consolidated and are now easier to manage. Send us your localization!
+* [Fix] Clicking on report titles doesn't collapse the box anymore (thank you, psn)
+* [Fix] Minor fixes to the Javascript used on admin pages
+* [Fix] Restored compatibility with the plugin Dashboard Widgets
+
+= 3.3.6 =
+* [New] Since you've asked, we added a datepicker to the filters
+* [Update] MaxMind / Geolocation database updated to October 2013
+* [Fix] We had some issues with our repository, which made WP SlimStat unavailable for a while. Sorry for the inconvenience.
+
+= 3.3.5 =
+* [Note] Our add-on [Export To Excel](http://slimstat.getused.to.it/addons/wp-slimstat-export-to-excel/) can now export the tabular data that makes up the charts (thank you, [consensus](http://wordpress.org/support/topic/graph-export))
+* [New] Now all the charts include comparison data for both metrics
+* [Fix] A javascript variable name conflict introduced in version 3.3.4 was affecting some advanced functionality (thank you, [Nanowisdoms](http://wordpress.org/support/topic/expand-details-option-not-working-in-334))
+* [Fix] A pretty unique combination of settings was affecting the way the Spy View data was being listed (thank you, [Nanowisdoms](http://wordpress.org/support/topic/live-visitor-as-in-currently-still-on-the-site-view))
 
 = 3.3.4 =
 * [Note] Now you can export the data from your User Overview custom report, with the Export to Excel add-on!
