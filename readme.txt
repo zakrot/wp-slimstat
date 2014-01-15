@@ -1,34 +1,21 @@
 === WP SlimStat ===
 Contributors: coolmann
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=BNJR5EZNY3W38
-Tags: chart, analytics, visitors, users, spy, shortstat, tracking, reports, seo, referers, analyze, wassup, geolocation, online users, spider, tracker, pageviews, world map, stats, maxmind, flot, stalker, statistics, google+, monitor, seo
-Requires at least: 3.2
-Tested up to: 3.7.1
-Stable tag: 3.4.3
+Tags: analytics, tracking, reports, analyze, wassup, geolocation, online users, spider, tracker, pageviews, stats, maxmind, statistics, statpress
+Requires at least: 3.8
+Tested up to: 3.8
+Stable tag: 3.5.2
 
 == Description ==
 A powerful real-time web analytics plugin for WordPress. Visit our [official site](http://slimstat.getused.to.it/) for more information.
 
 = Key Features =
-* Real-time web analytics reports
-* Compatible with W3 Total Cache, WP SuperCache, HyperCache and friends
-* Modern, easy to use and customizable interface (yep, you can move reports around and hide the ones you don't need)
-* The most accurate IP geolocation, browser and platform detection ever seen (courtesy of [MaxMind](http://www.maxmind.com/) and [Browscap](http://tempdownloads.browserscap.com/))
+* Real-time reports
+* Compatible with W3 Total Cache, WP SuperCache and HyperCache
+* The most accurate IP geolocation, browser and platform detection ever seen (courtesy of [MaxMind](http://www.maxmind.com/) and [Browscap](http://browscap.org))
 * Advanced filtering
+* Available in multiple languages: English, Chinese (沐熙工作室), Farsi ([Dean](http://www.mangallery.net)), French (Michael Bastin, Jean-Michel Venet), German (TechnoViel), Italian, Portuguese, Russian ([Vitaly](http://www.visbiz.org/)), Spanish, Swedish (Per Soderman). Is your language is missing or incomplete? [Contact Us](http://slimstat.getused.to.it/contact-us/) if you would like to share your localization.
 * World Map that works on your mobile device, too (courtesy of [amMap](http://www.ammap.com/)).
-
-= Available in multiple languages =
-* English
-* Chinese
-* Farsi
-* French
-* German
-* Italian
-* Portuguese
-* Russian
-* Spanish
-* Swedish
-* Your language is missing or incomplete? [Contact Us](http://slimstat.getused.to.it/contact-us/) to share your localization!
 
 = What are people saying about WP SlimStat? =
 * One of the 15+ Cool Free SEO Plugins for WordPress - [udesign](http://www.pixeldetail.com/wordpress/free-seo-plugins-for-wordpress/)
@@ -37,32 +24,31 @@ A powerful real-time web analytics plugin for WordPress. Visit our [official sit
 * Read all the [reviews](http://wordpress.org/support/view/plugin-reviews/wp-slimstat) and feel free to post your own
 
 = Requirements =
-* WordPress 3.2+ (it may not work on *large* multisite environments)
+* WordPress 3.8+ (it may not work on *large* multisite environments)
 * PHP 5.3+
 * MySQL 5.0.3+
 * At least 5 MB of free web space
 * At least 5 MB of free DB space
 * At least 10 Mb of free memory for the tracker
-
-= Browser Compatibility =
-WP SlimStat uses the HTML5 Canvas element and SVG graphics to display its charts and the world map. Unfortunately Internet Explorer 8 and older versions don't support them, so you're encouraged to upgrade your browser.
+* IE9+ or any browser supporting HTML5
 
 = Premium Add-ons =
-Please visit [our website](http://slimstat.getused.to.it/addons/) for an updated list of extensions.
+Visit [our website](http://slimstat.getused.to.it/addons/) for an updated list of available extensions.
 
 = Free Add-ons =
+* [WP SlimStat Dashboard Widgets](http://wordpress.org/extend/plugins/wp-slimstat-dashboard-widgets) adds the most important reports right on your WordPress Dashboard
 * [WP SlimStat Shortcodes](http://wordpress.org/extend/plugins/wp-slimstat-shortcodes/) allows you to share your reports with your readers
-* [WP SlimStat Dashboard Widgets](http://wordpress.org/extend/plugins/wp-slimstat-dashboard-widgets) adds the most important reports to your WordPress Dashboard
 
 == Installation ==
 
 0. **If you are upgrading from 2.8.4 or earlier, you MUST first install version 3.0 (deactivate/activate) and then upgrade to the latest release available**
-1. In your WP admin, go to Plugins > Add New
+1. In your WordPress admin, go to Plugins > Add New
 2. Search for WP SlimStat
-3. Click on Install Now under WP SlimStat
+3. Click on **Install Now** under WP SlimStat
 4. Make sure your template calls `wp_footer()` or the equivalent hook somewhere (possibly just before the `</body>` tag)
-5. To customize all the plugin's options, go to Slimstat > Settings
-6. If your wp-admin folder is not publicly accessible, please make sure to check the [FAQs](http://wordpress.org/extend/plugins/wp-slimstat/faq/) to see if there's anything else you need to do
+5. If your `wp-admin` folder is not publicly accessible, make sure to check the [FAQs](http://wordpress.org/extend/plugins/wp-slimstat/faq/) to see if there's anything else you need to do
+
+Please note: if you decide to uninstall WP SlimStat, all the stats will be **PERMANENTLY** deleted from your database. Make sure to setup a database backup (wp_slim_*) to avoid losing your data.
 
 == Frequently Asked Questions ==
 
@@ -71,20 +57,20 @@ WP SlimStat's tracking engine has a server-side component, which records all the
 and a client-side component, which collects extra data from your visitors' browsers, like their screen resolution, (x,y) coordinates of their
 clicks and the events they trigger. 
 
-One of the files responsible for taking care of this is `admin-ajax.php`, usually located inside your */wp-admin/* folder.
+One of the files handling all the client-server communications is WordPress' `admin-ajax.php`, usually located inside your */wp-admin/* folder.
 Point your browser to that file directly: if you see an error 404 or 500, then you will need to fix that problem, to allow WP SlimStat to do its job.
 If you see the number zero, then the problem could be related to a conflict with another plugin (caching, javascript minimizers, etc).
 
-= I am using W3 Total Cache/WP Super Cache/HyperCache/etc, and it looks like your plugin is not tracking all of my visitors. Can you help me? =
-Simply go to SlimStat > Settings > General tab, and enable Javascript Mode. WP SlimStat will only track human visitors (just like Google Analytics does, pretty much), but its accuracy will dramatically improve.
-Don't forget to invalidate/clear your plugin's cache, to let SlimStat add its tracking code to all the newly cached pages.
+= I am using W3 Total Cache (or WP Super Cache, HyperCache, etc), and it looks like WP SlimStat is not tracking all of my visitors. Can you help me? =
+Go to SlimStat > Settings > General and set Tracking Mode to Javascript. Don't forget to invalidate/clear your plugin's cache, to let SlimStat add its tracking code to all the newly cached pages.
+Also, if you're using W3 Total Cache, make sure to exclude wp-slimstat.js from the minifier: our code is already minified, and it looks like W3TC breaks something when it tries to minify it again.
 
 = My screen goes blank when trying to access the reports / after installing WP SlimStat =
-Try [to increase the amount of memory](http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP) allocated to PHP. If that doesn't help,
-go to SlimStat > Settings > Maintenance and click on the Reset Tabs button.
+Go to SlimStat > Settings > Maintenance and click on the No Panic Button. If that doesn't help,
+[increase the amount of memory](http://codex.wordpress.org/Editing_wp-config.php#Increasing_memory_allocated_to_PHP) allocated to PHP.
 
 = When trying to access any of options screens, I get the following error: You do not have sufficient permissions to access this page. =
-You were playing with the plugin's permission settings, weren't you? But don't worry, there's a secret passage that will allow you to unlock your access. Create a new user `slimstatadmin`, and assign him the Administrator role. Then log into your WordPress admin area with the new user and... voila: you can now access WP SlimStat's settings again. Update your users' permissions and then get rid of this newly created user.
+You were playing with the plugin's permission settings, weren't you? But don't worry, there's a secret passage that will allow you to unlock your access. Create a new WordPress admin user named `slimstatadmin`. Then log into your WordPress admin area with the new user and... voila: you can now access WP SlimStat's settings again. Update your users' permissions and then get rid of this newly created user.
 
 = I am using WP Touch, and mobile visitors are not tracked by your plugin. How can I fix this problem? =
 WP Touch has an advanced option that they call Restricted Mode, which attempts to fix issues where other plugins load scripts which interfere with WPtouch CSS and JavaScript. If you enable this feature, it will prevent WP SlimStat from running the tracking script (thank you, [Per](http://wordpress.org/support/topic/known-users-not-logged)).
@@ -92,31 +78,35 @@ WP Touch has an advanced option that they call Restricted Mode, which attempts t
 = How can I change the colors associated to color-coded pageviews (known user, known visitors, search engines, etc)? =
 Go to SlimStat > Settings > Advanced tab and paste your custom CSS into the corresponding field. Use the following code as a reference:
 
-`.postbox p.is-search-engine,
-.legend span.is-search-engine{background-color:#C1E751;color:#444}
-
-.postbox p.is-direct,
-.legend span.is-direct{background-color:#D0E0EB;color:#111}
-
-.postbox p.is-known-user,
-.legend span.is-known-user{background-color:#F1CF90}
-
-.postbox p.is-known-visitor,
-.legend span.is-known-visitor{background-color:#EFFD8C}
-
-.postbox p.is-spam,
-.legend span.is-spam{background-color:#AAB3AB;color:#222}`
+`[id^=slim_] .header.is-search-engine, .is-search-engine{
+	background-color:#c1e751;
+	color:#444;
+}
+[id^=slim_] .header.is-direct, .is-direct{
+	background-color:#d0e0eb;
+	color:#111;
+}
+[id^=slim_] .header.is-known-user,.is-known-user{
+	background-color:#F1CF90;
+}
+[id^=slim_] .header.is-known-visitor,.is-known-visitor{
+	background-color:#EFFD8C;
+}
+[id^=slim_] .header.is-spam,.is-spam{
+	background-color:#AAB3AB;
+	color:#222;
+}`
 
 = Can I track clicks and other events happening on the page? =
 Yes, you can. This plugin includes a Javascript handler that can be attached to any event: click, mouseover, focus, keypress, etc. Here's the syntax:
 
-`SlimStat.ss_track(e, c, n)`
+`SlimStat.ss_track(event, event_id, message)`
 
 Where:
 
-* `e` is the event that was triggered (the word 'event' *must* be used when attaching event handlers to HTML tags, see examples below)
-* `c` is a numeric value between 1 and 254 (zero is reserved for outbound clicks)
-* `n` is a custom text (up to 512 chars long) that you can use to add a note to the event tracked. If the ID attribute is defined, and no note has been specified, the former will be recorded. If the function is attached to a key-related event, the key pressed will be recorded.
+* `event` is the event that was triggered (the word 'event' *must* be used when attaching event handlers to HTML tags, see examples below)
+* `event_id` is a numeric value between 1 and 254 (zero is reserved for outbound clicks)
+* `message` is a custom message (up to 512 chars long) that can be used to add a note to the event tracked. If the ID attribute is defined, and no note has been specified, the former will be recorded. If the function is attached to a key-related event, the key pressed will be recorded.
 
 Examples:
 
@@ -168,14 +158,14 @@ GROUP BY resource
 ORDER BY countresults DESC
 LIMIT 0,20`
 
-Just write a function that gets the results and displays them, making sure to use the same HTML mark-up shown in the example here below:
+Just write a function that gets the results and displays them, making sure to use the same HTML markup shown here below:
 
 `public function my_cystom_report() {
 	$sql = "SELECT ...";
 	$results = $wpdb->get_results($sql, ARRAY_A);
 
-	// Reports come in three sizes: wide, medium, normal (default).
-	wp_slimstat_reports:report_header('my_custom_report_id', 'My Custom Report Inline Help', 'medium', false, '', 'My cool report');
+	// Reports come in two sizes: normal (default) and wide.
+	wp_slimstat_reports:report_header('my_custom_report_id', 'report_size', 'My Custom Report Tooltip', 'My Cool Report Name');
 
 	foreach($results as $a_result){
 		echo "<p>{$a_result['resource']} <span>{$a_result['countresults']}</span></p>";
@@ -188,7 +178,7 @@ Then let WP SlimStat know about it:
 
 `add_action('wp_slimstat_custom_report', 'my_cystom_report');`
 
-Save your file as `my_custom_report.php` and then [follow these instructions](http://codex.wordpress.org/Writing_a_Plugin#Standard_Plugin_Information) on how to make a plugin out of that file.
+Save your file as `my_custom_report.php` and then [follow these instructions](http://codex.wordpress.org/Writing_a_Plugin#Standard_Plugin_Information) to make a plugin out of that file.
 
 = Can I disable outbound link tracking on a given link? =
 Yes, you can. This is useful if you notice that, after clicking on a Lightbox-powered thumbnail, the image doesn't open inside the popup window as expected.
@@ -209,14 +199,11 @@ requests from that user's browser and are indistinguishable from user link click
 in SlimStat > Settings > Filters
 
 = Why can't WP SlimStat track visitors using IPv6? =
-IPv6 support, as of today, is still really limited both in PHP and MySQL. There are a few workarounds that could be implemented, but this
+IPv6 support, as of today, is still limited both in PHP and MySQL. There are a few workarounds that could be implemented, but this
 would make the DB structure less optimized, add overhead for tracking regular requests, and you would have a half-baked product.
 
-= How do I stop WP SlimStat from tracking spammers? =
+= How do I prevent WP SlimStat from tracking spammers? =
 Go to SlimStat > Settings > Filters and set "Ignore Spammers" to YES.
-
-= How do I stop WP SlimStat from recording new visits on my site? =
-Go to SlimStat > Settings > General and set "Activate tracking" to NO.
 
 = Can I add/show reports on my website? =
 Yes, you can. WP SlimStat offers two ways of displaying its reports on your website.
@@ -275,13 +262,57 @@ foreach ($results...`
 
 == Screenshots ==
 
-1. What's happening right now on your site
-2. All the information at your fingertips
-3. Configuration panels offer flexibility and plenty of options
-4. Mobile view, to keep an eye on your stats on the go
-5. Access your stats from within WordPress for iOS
+1. **Overview** - Your website traffic at a glance
+2. **Right Now** - A real-time view of your visitors' whereabouts 
+3. **Settings** - Plenty of options to customize the plugin's behavior
+4. **Interactive World Map** - See where your visitors are coming from
+5. **Responsive layout** - Keep an eye on your reports on the go
 
 == Changelog ==
+
+= 3.5.2 =
+* [Update] The Reports Library (wp-slimstat-db.php) has been streamlined. Please make sure to update your custom add-ons to use the new structure, or contact us if you need help.
+* [Update] The new DB Library uses 1 more SQL query per report, but much less PHP memory to store the results. You'll notice the difference!
+* [Fix] A snippet of code meant to be part of a future update, sneaked into v3.5.1, breaking the compatibility with WP SlimStat Shortcodes. We apologize for any inconvenience this may have caused.
+
+= 3.5.1 =
+* [Note] We got quite a lot of feedback about the new interface. Thank you for speaking up (yes, I'm looking at you, Romain and dFactory)!
+* [Note] Please make sure to clear your browser cache, if your reports look all messy and broken!
+* [New] You can now reload the World Map without reloading the entire page.
+* [Update] Colors now adapt to the admin color scheme currently active (thank you, [dFactory](http://wordpress.org/support/topic/v35-oh-man)).
+* [Update] Added new responsive layout for very large screens (width > 1440px).
+* [Update] Say hi to our own Icon Font Set, which replaces all the png icons we were using before (courtesy of [Fontello](http://fontello.com/), thank you, [dFactory](http://wordpress.org/support/topic/v35-oh-man)).
+* [Update] A new World Flags icon set makes things look even more consistent
+* [Update] Chart Tooltips are back!
+* [Update] RTL Support is being added to the CSS
+* [Update] FAQs have been updated to match the new Settings screens.
+* [Update] [flot](https://github.com/flot/flot) plotting library updated to version 0.8.2 stable
+* [Fix] The Add-ons Settings page was not rendering properly (thank you, Alexander et al.).
+* [Fix] The author filter was not working properly (thank you, [advertisingtech](http://wordpress.org/support/topic/author-filter-1))
+* [Fix] Bug with the new Currently Online report (it was honiring date filters, which was sort of confusing).
+* [Fix] Bug affecting tooltips in Firefox.
+* [Fix] Bug affecting database indexes (thank you, [frequencycast](http://wordpress.org/support/topic/ip-address-labelling-plug-in-stopped-working))
+* [Fix] Bug affecting SlimScroll in Firefox (thank you, [Gerard ter Beke](http://wordpress.org/support/topic/scrolling-activity-log-in-firefox-does-not-work-in-v35)).
+* [Fix] Conflict with another plugin related to the logout button (thank you, [GusRuss89](http://wordpress.org/support/topic/logout-button-conflicts-with-wp-slimstat))
+* [Fix] Bug on masking IP Addresses on 32-bit systems, which apparently hadn't been fixed in 3.5 (thank you, carbeck)
+
+= 3.5 =
+* [Note] Please make sure to clear your browser cache, if your reports look all messy and broken!
+* [New] A polished and fully responsive interface, optimized for the new WordPress 3.8 admin layout. If you're still using WP 3.7 or earlier, you may want to stick to version 3.4.3. 
+* [New] Implemented *Slim*Scroll (what else? hehe) by [Piotr Rochala](http://rocha.la).
+* [New] Added qTip 2 to handle tooltips and contextual help.
+* [New] Added two new reports: who's currently online (registered users), and top language families (thank you, Vitaly)
+* [New] Now you can track 'fake' pageviews (if events are not enough for you)
+* [New] Pagination has been added to most reports: now you will not miss anything!
+* [Update] The 'Latest News' ribbon is now only displayed within the report screens, and it disappears automatically after 5 minutes.
+* [Update] [Browscap](http://browscap.co/) has been updated to version 5021-b9, released on Dec 8, 2013
+* [Updade] Most add-ons have been updated to use the new look and feel, icons, etc.
+* [Update] All the Settings screens have been reorganized and redesigned (and are now fully responsive!). We replaced the old "for geeks only" descriptions with new ones, easier to understand.
+* [Update] The plugin's source code is being consolidated and reorganized. You reports will now load faster than ever!
+* [Update] By default, Javascript Mode (or Tracking Mode, in v3.5) is now enabled
+* [Update] Added new icon for Windows 8.1
+* [Update] MaxMind / Geolocation database updated to December 2013
+* [Fix] Bug on masking IP Addresses on 32-bit systems (thank you, Per)
 
 = 3.4.3 =
 * [Fix] Bug in parsing the data returned by Alexa (new Rankings report) was causing some reports to disappear (thank you, [pepe](http://wordpress.org/support/topic/php-warnings-in-rankings-box))
@@ -337,16 +368,24 @@ foreach ($results...`
 * [Fix] A javascript variable name conflict introduced in version 3.3.4 was affecting some advanced functionality (thank you, [Nanowisdoms](http://wordpress.org/support/topic/expand-details-option-not-working-in-334))
 * [Fix] A pretty unique combination of settings was affecting the way the Spy View data was being listed (thank you, [Nanowisdoms](http://wordpress.org/support/topic/live-visitor-as-in-currently-still-on-the-site-view))
 
-== Donors ==
+== Distinguished Users ==
+
+* [Vitaly](http://www.visbiz.org/) - Volunteered quite a lot of time for QA and testing, and provided the complete Russian localization
+* [Davide Tomasello](http://www.davidetomasello.it/) - Gave us great feedback and plenty of ideas to take this plugin to the next level
+
+== Supporters ==
 [7times77](http://7times77.com),
 [Andrea Pinti](http://andreapinti.com),
+Beauzartes,
 [Bluewave Blog](http://blog.bluewaveweb.co.uk),
+[BoldVegan](boldvegan.com),
 [Caigo](http://www.blumannaro.net),
 [Christian Coppini](http://www.coppini.me),
 Dave Johnson,
 [Dennis Kowallek](http://www.adopt-a-plant.com),
 [Damian](http://wipeoutmedia.com),
 [Edward Koon](http://www.fidosysop.org),
+Erik Ludvigsson,
 Fabio Mascagna,
 [Gabriela Lungu](http://www.cosmeticebio.org),
 Gary Swarer,
@@ -360,6 +399,7 @@ John Montano,
 Mobile Lingo Inc,
 [Mobilize Mail](http://blog.mobilizemail.com),
 Mora Systems,
+Motionart Inc,
 Neil Robinson,
 [Ovidiu](http://pacura.ru/),
 [Sahin Eksioglu](http://www.alternatifblog.com),
@@ -375,7 +415,13 @@ Thomas Weiss,
 Wayne Liebman,
 Willow Ridge Press
 
-== Special Thanks To ==
-
-* [Davide Tomasello](http://www.davidetomasello.it/), for all the great feedback he sent me and the time spent looking for bugs and inconsistencies
-* [Thomas Nielsen](http://www.bogt.dk/), for his generous donation and for helping with the new icon set.
+== Tools of the trade, in alphabetical order ==
+* [Duri.Me](http://duri.me/)
+* [Filezilla](https://filezilla-project.org/)
+* [Fontello](http://fontello.com/)
+* [Gimp](http://www.gimp.org/)
+* [Google Chrome](https://www.google.com/intl/en/chrome/browser/)
+* [poEdit](http://www.poedit.net/)
+* [Notepad++](http://notepad-plus-plus.org/)
+* [Tortoise SVN](http://tortoisesvn.net/)
+* [WAMP Server](http://www.wampserver.com/en/)

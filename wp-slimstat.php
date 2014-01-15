@@ -3,15 +3,15 @@
 Plugin Name: WP SlimStat
 Plugin URI: http://wordpress.org/extend/plugins/wp-slimstat/
 Description: A powerful real-time web analytics plugin for Wordpress.
-version: 3.4.3
+version: 3.5.2
 Author: Camu
 Author URI: http://slimstat.getused.to.it/
 */
-
+ 
 if (!empty(wp_slimstat::$options)) return true;
 
 class wp_slimstat{
-	public static $version = '3.4.3';
+	public static $version = '3.5.2';
 	public static $options = array();
 	
 	public static $wpdb = '';
@@ -79,7 +79,7 @@ class wp_slimstat{
 				if (self::$options['track_users'] == 'yes') add_action('login_enqueue_scripts', array(__CLASS__, 'wp_slimstat_enqueue_tracking_script'), 10);
 			}
 		}
-		
+
 		// Update the options before shutting down
 		add_action('shutdown', array(__CLASS__, 'slimstat_save_options'));
 	}
@@ -88,7 +88,7 @@ class wp_slimstat{
 	/**
 	 * Ajax Tracking (client-side, javascript)
 	 */
-	public static function slimtrack_js(){	
+	public static function slimtrack_js(){
 		$data_string = base64_decode($_REQUEST['data']);
 		if ($data_string === false){
 			do_action('slimstat_track_exit_101');
@@ -158,7 +158,7 @@ class wp_slimstat{
 		self::$stat['plugins'] = !empty(self::$data_js['pl'])?substr(str_replace('|', ',', self::$data_js['pl']), 0, -1):'';
 
 		// If Javascript mode is enabled, record this pageview
-		if (self::$options['javascript_mode'] == 'yes'){
+		if (self::$options['javascript_mode'] == 'yes' || !empty(self::$data_js['ci'])){
 			self::slimtrack();
 		}
 		else{
@@ -213,7 +213,7 @@ class wp_slimstat{
 				self::$stat['id'] = -208;
 				return $_argument;
 			}
-			
+
 			if (isset($referer['host'])){
 				self::$stat['domain'] = $referer['host'];
 
@@ -278,7 +278,7 @@ class wp_slimstat{
 
 		// User's IP address
 		list(self::$stat['ip'], $long_other_ip) = self::_get_ip2long_remote_ip();
-		if (self::$stat['ip'] == 0){
+		if (empty(self::$stat['ip'])){
 			self::$stat['id'] = -203;
 			return $_argument;
 		}
@@ -310,7 +310,7 @@ class wp_slimstat{
 		}
 		elseif (isset($_COOKIE['comment_author_'.COOKIEHASH])){
 			// Is this a spammer?
-			$spam_comment = self::$wpdb->get_row("SELECT comment_author, COUNT(*) comment_count FROM {$GLOBALS['wpdb']->prefix}comments WHERE INET_ATON(comment_author_IP) = '".self::$stat['ip']."' AND comment_approved = 'spam' GROUP BY comment_author LIMIT 0,1", ARRAY_A);
+			$spam_comment = self::$wpdb->get_row("SELECT comment_author, COUNT(*) comment_count FROM {$GLOBALS['wpdb']->prefix}comments WHERE INET_ATON(comment_author_IP) = '".sprintf("%u", self::$stat['ip'])."' AND comment_approved = 'spam' GROUP BY comment_author LIMIT 0,1", ARRAY_A);
 			if (isset($spam_comment['comment_count']) && $spam_comment['comment_count'] > 0){
 				if (self::$options['ignore_spammers'] == 'yes'){
 					self::$stat['id'] = -202;
@@ -342,22 +342,24 @@ class wp_slimstat{
 			}
 		}
 
-		if (!empty($long_other_ip) && $long_other_ip != self::$stat['ip']){
-			self::$stat['other_ip'] = $long_other_ip;
-		}
-
 		// Country and Language
 		self::$stat['language'] = self::_get_language();
 		self::$stat['country'] = self::_get_country(self::$stat['ip']);
 
 		// Anonymize IP Address?
-		if (self::$options['anonymize_ip'] == 'yes' && self::$stat['country'] != 'xy'){
+		if (self::$options['anonymize_ip'] == 'yes'){
 			self::$stat['ip'] = self::$stat['ip']&4294967040;
 			if (!empty(self::$stat['other_ip'])) self::$stat['other_ip'] = self::$stat['other_ip']&4294967040;
 		}
 
+		// Because PHP's integer type is signed, and many IP addresses will result in negative integers on 32-bit architectures, we need to use the "%u" formatter of sprintf()
+		self::$stat['ip'] = sprintf("%u", self::$stat['ip']);
+		if (!empty($long_other_ip) && $long_other_ip != self::$stat['ip']){
+			self::$stat['other_ip'] = sprintf("%u", $long_other_ip);
+		}
+
 		// Is this country blacklisted?
-		if (stripos(self::$options['ignore_countries'], self::$stat['country']) !== false){
+		if (is_string(self::$options['ignore_countries']) && stripos(self::$options['ignore_countries'], self::$stat['country']) !== false){
 			self::$stat['id'] = -206;
 			return $_argument;
 		}
@@ -440,15 +442,21 @@ class wp_slimstat{
 	/**
 	 * Searches for country associated to a given IP address
 	 */
-	protected static function _get_country($_ipnum = ''){
+	protected static function _get_country($_ipnum = 0){
+		$float_ipnum = (float)sprintf("%u", $_ipnum);
+
 		// Is this a RFC1918 (local) IP?
-		if ($_ipnum == 2130706433 ||
-			($_ipnum >= 167772160 && $_ipnum <= 184549375) ||
-			($_ipnum >= 2886729728 && $_ipnum <= 2887778303) ||
-			($_ipnum >= 3232235520 && $_ipnum <= 3232301055)) return 'xy';
+		if ($float_ipnum == 2130706433 || // 127.0.0.1
+			($float_ipnum >= 167772160 && $float_ipnum <= 184549375) || // 10.0.0.1 - 10.255.255.255
+			($float_ipnum >= 2886729728 && $float_ipnum <= 2887778303) || // 172.16.0.1 - 172.31.255.255
+			($float_ipnum >= 3232235521 && $float_ipnum <= 3232301055) ){ // 192.168.0.1 - 192.168.255.255
+				return 'xy';
+		}
 		
 		$country_codes = array("","ap","eu","ad","ae","af","ag","ai","al","am","cw","ao","aq","ar","as","at","au","aw","az","ba","bb","bd","be","bf","bg","bh","bi","bj","bm","bn","bo","br","bs","bt","bv","bw","by","bz","ca","cc","cd","cf","cg","ch","ci","ck","cl","cm","cn","co","cr","cu","cv","cx","cy","cz","de","dj","dk","dm","do","dz","ec","ee","eg","eh","er","es","et","fi","fj","fk","fm","fo","fr","sx","ga","gb","gd","ge","gf","gh","gi","gl","gm","gn","gp","gq","gr","gs","gt","gu","gw","gy","hk","hm","hn","hr","ht","hu","id","ie","il","in","io","iq","ir","is","it","jm","jo","jp","ke","kg","kh","ki","km","kn","kp","kr","kw","ky","kz","la","lb","lc","li","lk","lr","ls","lt","lu","lv","ly","ma","mc","md","mg","mh","mk","ml","mm","mn","mo","mp","mq","mr","ms","mt","mu","mv","mw","mx","my","mz","na","nc","ne","nf","ng","ni","nl","no","np","nr","nu","nz","om","pa","pe","pf","pg","ph","pk","pl","pm","pn","pr","ps","pt","pw","py","qa","re","ro","ru","rw","sa","sb","sc","sd","se","sg","sh","si","sj","sk","sl","sm","sn","so","sr","st","sv","sy","sz","tc","td","tf","tg","th","tj","tk","tm","tn","to","tl","tr","tt","tv","tw","tz","ua","ug","um","us","uy","uz","va","vc","ve","vg","vi","vn","vu","wf","ws","ye","yt","rs","za","zm","me","zw","a1","a2","o1","ax","gg","im","je","bl","mf","bq","ss","o1");
-		if (!$handle = fopen(WP_PLUGIN_DIR."/wp-slimstat/databases/maxmind.dat", "rb")) return 'xx';
+		if (!$handle = fopen(WP_PLUGIN_DIR."/wp-slimstat/databases/maxmind.dat", "rb")){
+			return 'xx';
+		}
 
 		$offset = 0;
 		for ($depth = 31; $depth >= 0; --$depth) {
@@ -486,26 +494,30 @@ class wp_slimstat{
 	protected static function _get_ip2long_remote_ip(){
 		$long_ip = array(0, 0);
 
-		if (isset($_SERVER["REMOTE_ADDR"]) && long2ip($ip2long = ip2long($_SERVER["REMOTE_ADDR"])) == $_SERVER["REMOTE_ADDR"])
-			$long_ip[0] = sprintf("%u", $ip2long);
+		if (isset($_SERVER["REMOTE_ADDR"]) && filter_var($_SERVER["REMOTE_ADDR"], FILTER_VALIDATE_IP) !== false){
+			$long_ip[0] = ip2long($_SERVER["REMOTE_ADDR"]);
+		}
 
-		if (isset($_SERVER["HTTP_CLIENT_IP"]) && long2ip($long_ip[1] = sprintf("%u", ip2long($_SERVER["HTTP_CLIENT_IP"]))) == $_SERVER["HTTP_CLIENT_IP"])
-			return $long_ip;
+		if (isset($_SERVER["HTTP_CLIENT_IP"]) && filter_var($_SERVER["HTTP_CLIENT_IP"], FILTER_VALIDATE_IP) !== false){
+			$long_ip[1] = ip2long($_SERVER["HTTP_CLIENT_IP"]);
+		}
 
-		if (isset($_SERVER["HTTP_X_FORWARDED_FOR"]))
+		if (isset($_SERVER["HTTP_X_FORWARDED_FOR"])){
 			foreach (explode(",",$_SERVER["HTTP_X_FORWARDED_FOR"]) as $a_ip){
-				if (long2ip($long_ip[1] = sprintf("%u", ip2long($a_ip))) == $a_ip)
+				if (filter_var($a_ip, FILTER_VALIDATE_IP) !== false){
+					$long_ip[1] = ip2long($a_ip);
 					return $long_ip;
+				}
 			}
+		}
 
-		if (isset($_SERVER["HTTP_X_FORWARDED"]) && long2ip($long_ip[1] = sprintf("%u", ip2long($_SERVER["HTTP_X_FORWARDED"]))) == $_SERVER["HTTP_X_FORWARDED"])
-			return $long_ip;
+		if (isset($_SERVER["HTTP_FORWARDED"]) && filter_var($_SERVER["HTTP_FORWARDED"], FILTER_VALIDATE_IP) !== false){
+			$long_ip[1] = ip2long($_SERVER["HTTP_FORWARDED"]);
+		}
 
-		if (isset($_SERVER["HTTP_FORWARDED_FOR"]) && long2ip($long_ip[1] = sprintf("%u", ip2long($_SERVER["HTTP_FORWARDED_FOR"]))) == $_SERVER["HTTP_FORWARDED_FOR"])
-			return $long_ip;
-
-		if (isset($_SERVER["HTTP_FORWARDED"]) && long2ip($long_ip[1] = sprintf("%u", ip2long($_SERVER["HTTP_FORWARDED"]))) == $_SERVER["HTTP_FORWARDED"])
-			return $long_ip;
+		if (isset($_SERVER["HTTP_X_FORWARDED"]) && filter_var($_SERVER["HTTP_X_FORWARDED"], FILTER_VALIDATE_IP) !== false){
+			$long_ip[1] = ip2long($_SERVER["HTTP_X_FORWARDED"]);
+		}
 
 		return $long_ip;
 	}
@@ -658,9 +670,9 @@ class wp_slimstat{
 	protected static function _get_browser(){
 		// Load cache
 		@include_once(plugin_dir_path( __FILE__ ).'databases/browscap.php');
-		
+
 		$browser = array('browser' => 'Default Browser', 'version' => '1', 'platform' => 'unknown', 'css_version' => 1, 'type' => 1);
-		if (!is_array($slimstat_patterns)) return $browser;
+		if (empty($slimstat_patterns) || !is_array($slimstat_patterns)) return $browser;
 
 		$user_agent = isset($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:'';
 		$search = array();
@@ -1002,54 +1014,61 @@ class wp_slimstat{
 			'secret' => get_option('slimstat_secret', md5(time())),
 			'show_admin_notice' => 0,
 			
+			// General
 			'is_tracking' => get_option('slimstat_is_tracking', 'yes'),
 			'track_admin_pages' => 'no',
-			'javascript_mode' => 'no',
-			'auto_purge' => get_option('slimstat_auto_purge', '120'),
+			'enable_javascript' => 'yes',
+			'javascript_mode' => 'yes',
 			'add_posts_column' => get_option('slimstat_add_posts_column', 'no'),
 			'use_separate_menu' => get_option('slimstat_use_separate_menu', 'yes'),
+			'auto_purge' => get_option('slimstat_auto_purge', '120'),
 
+			// Views
 			'convert_ip_addresses' => get_option('slimstat_convert_ip_addresses', 'no'),
-			'async_load' => 'no',
 			'use_european_separators' => get_option('slimstat_use_european_separators', 'yes'),
 			'show_display_name' => 'no',
-			'rows_to_show' => get_option('slimstat_rows_to_show', '20'),
+			'show_complete_user_agent_tooltip' => 'no',
+			'convert_resource_urls_to_titles' => 'yes',
+			'async_load' => 'no',
 			'expand_details' => 'no',
+			'rows_to_show' => get_option('slimstat_rows_to_show', '20'),
+			'refresh_interval' => get_option('slimstat_refresh_interval', '60'),
 			'number_results_raw_data' => get_option('slimstat_number_results_raw_data', '50'),
 			'include_outbound_links_right_now' => 'no',
-			'ip_lookup_service' => 'http://www.infosniper.net/?ip_address=',
-			'refresh_interval' => get_option('slimstat_refresh_interval', '0'),
-			'hide_stats_link_edit_posts' => 'no',
-			'show_complete_user_agent_tooltip' => 'no',
-			'custom_css' => '',
-			'markings' => '',
 
+			// Filters
 			'track_users' => get_option('slimstat_track_users', 'yes'),
-			'ignore_spammers' => get_option('slimstat_ignore_spammers', 'no'),
-			'anonymize_ip' => 'no',
-			'ignore_prefetch' => get_option('slimstat_ignore_prefetch', 'no'),
+			'ignore_users' => get_option('slimstat_ignore_users', ''),
 			'ignore_ip' => get_option('slimstat_ignore_ip', ''),
+			'ignore_capabilities' => '',
+			'ignore_spammers' => get_option('slimstat_ignore_spammers', 'yes'),
 			'ignore_resources' => get_option('slimstat_ignore_resources', ''),
 			'ignore_countries' => get_option('slimstat_ignore_countries', ''),
 			'ignore_browsers' => get_option('slimstat_ignore_browsers', ''),
 			'ignore_referers' => get_option('slimstat_ignore_referers', ''),
-			'ignore_users' => get_option('slimstat_ignore_users', ''),
-			'ignore_capabilities' => '',
+			'anonymize_ip' => 'no',
+			'ignore_prefetch' => get_option('slimstat_ignore_prefetch', 'yes'),
 
-			'restrict_authors_view' => 'no',
+			// Permissions
+			'restrict_authors_view' => 'yes',
 			'capability_can_view' => get_option('slimstat_capability_can_view', 'activate_plugins'),
-			'capability_can_admin' => 'activate_plugins',
 			'can_view' => get_option('slimstat_can_view', ''),
+			'capability_can_admin' => 'activate_plugins',
 			'can_admin' => get_option('slimstat_can_admin', ''),
-			
-			'enable_javascript' => 'yes',
+
+			// Advanced
 			'detect_smoothing' => 'yes',
 			'enable_outbound_tracking' => 'yes',
 			'session_duration' => 1800,
 			'extend_session' => 'no',
-			'enable_cdn' => 'no',
-			'extensions_to_track' => '',
-			'enable_ads_network' => 'null'
+			'enable_cdn' => 'yes',
+			'extensions_to_track' => 'pdf,doc,xls,zip',
+			'ip_lookup_service' => 'http://www.infosniper.net/?ip_address=',
+			'custom_css' => '',
+			'enable_ads_network' => 'null',
+			
+			// Misc
+			'enable_hacker_ninja' => 'no'
 		);
 
 		return $options;
@@ -1145,12 +1164,11 @@ class wp_slimstat{
 		self::$options['capability_can_view'] = empty(self::$options['capability_can_view'])?'read':self::$options['capability_can_view'];
 
 		if (empty(self::$options['can_view']) || strpos(self::$options['can_view'], $GLOBALS['current_user']->user_login) !== false || current_user_can('manage_options')){
+			$slimstat_view_url = $slimstat_config_url = 'admin.php';
 			if (self::$options['use_separate_menu'] != 'yes'){
 				$slimstat_view_url = $slimstat_config_url = 'options.php';
 			}
-			else{
-				$slimstat_view_url = $slimstat_config_url = 'admin.php';
-			}
+
 			$slimstat_view_url = get_site_url($GLOBALS['blog_id'], "/wp-admin/$slimstat_view_url?page=wp-slim-view-");
 			$slimstat_config_url = get_site_url($GLOBALS['blog_id'], "/wp-admin/$slimstat_config_url?page=wp-slim-config");
 			
