@@ -454,7 +454,7 @@
 /* Edit Posts Page */
 .column-wp-slimstat{
 	text-align: center !important;
-	width: 2em;
+	width: 3em;
 }
 .slimstat-icon:before{
 	content: '\f239';
