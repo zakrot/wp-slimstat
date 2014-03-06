@@ -280,6 +280,7 @@ foreach ($results...`
 * [Fix] Missing space in SQL query was the cause of empty reports in some cases (thank you, [psn](http://wordpress.org/support/topic/no-data-for-certain-boxes))
 * [Fix] Warning on undefined index when trying to create a new blog in a MU environment (thank you, [Sam Brodie](http://wordpress.org/support/topic/undefined-index-error-in-version))
 * [Fix] Bug in displaying more days than necessary for some months, in the chart
+* [Fix] Filtering by IP Address was not working with our Firewall Fix add-on
 * [Fix] Natural language date ranges were being calculated based on UTC, not the blog's timezone (thank you, [haheute](http://wordpress.org/support/topic/pageviews-per-day-not-working))
 
 = 3.5.5 =
