@@ -127,6 +127,7 @@ class wp_slimstat_reports{
 		self::$all_reports = (empty(self::$all_reports) || empty(self::$all_reports[0]))?array():explode(',', self::$all_reports[0]);
 
 		$all_existing_reports = array(
+			0 => array(),
 			1 => array('slim_p7_02'),
 			2 => array('slim_p1_01','slim_p1_02','slim_p1_03','slim_p1_04','slim_p1_11','slim_p1_12','slim_p1_05','slim_p1_08','slim_p1_10','slim_p1_13','slim_p1_15','slim_p1_17'),
 			3 => array('slim_p2_01','slim_p2_02','slim_p2_03','slim_p2_04','slim_p2_06','slim_p2_05','slim_p2_07','slim_p2_09','slim_p2_10','slim_p2_12','slim_p2_13','slim_p2_14','slim_p2_15','slim_p2_16','slim_p2_17','slim_p2_18','slim_p2_19','slim_p2_20','slim_p2_21'),

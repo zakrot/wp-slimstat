@@ -242,8 +242,12 @@
 
 /* Single Report: Debug Message */
 .slimstat .debug{
-	background-color: #555;
-	color: #eee;
+	background-color: #000;
+	color: #fff;
+	font-family: monospace;
+	opacity: .7;
+	position: absolute;
+	z-index: 5;
 }
 
 /* Single Report: Color Coded Entries */
@@ -378,6 +382,9 @@
 #slimstat-message p{
 	font-size: 16px;
 	line-height: .8em;
+}
+#slimstat-message a{
+	color: #fc0;
 }
 .nav-tabs{
 	margin: 20px 0 0;
