@@ -535,7 +535,7 @@ class wp_slimstat_reports{
 
 			// Some columns require a special post-treatment
 			if ($_column == 'resource' && strpos($_args['custom_where'], '404') === false){
-				$element_value = '<a target="_blank" class="slimstat-font-logout" title="'.__('Open this URL in a new window','wp-slimstat').'" href="'.htmlentitites($results[$i]['resource'], ENT_QUOTES, 'UTF-8').'"></a> '.$element_value;
+				$element_value = '<a target="_blank" class="slimstat-font-logout" title="'.__('Open this URL in a new window','wp-slimstat').'" href="'.htmlentities($results[$i]['resource'], ENT_QUOTES, 'UTF-8').'"></a> '.$element_value;
 			}
 			if ($_column == 'domain'){
 				$element_url = htmlentities((strpos($results[$i]['referer'], '://') == false)?"http://{$results[$i]['domain']}{$results[$i]['referer']}":$results[$i]['referer'], ENT_QUOTES, 'UTF-8');
