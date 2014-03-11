@@ -453,7 +453,7 @@ class wp_slimstat_db {
 				FROM '.self::$sql_filters['from']['all_tables'].' '.(!empty($_join_tables)?self::_add_filters_to_sql_from($_join_tables):'').'
 				WHERE '.(empty($_custom_where)?"$_column <> 0 ":$_custom_where).' '.self::$sql_filters['where'].' '.($_use_date_filters?self::$sql_filters['where_time_range']:'').'
 				ORDER BY '.(empty($_order_by)?'t1.dt '.self::$filters_normalized['misc']['direction']:$_order_by).'
-				LIMIT '.self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results']);
+				LIMIT '.self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results'], '', 'dt DESC');
 			
 		}
 		else{
@@ -711,10 +711,12 @@ class wp_slimstat_db {
 		echo "<p class='debug'>$_message</p>";
 	}
 
-	protected static function _get_results($_sql = ''){
+	protected static function _get_results($_sql = '', $_group_by = '', $_order_by = ''){
 		if (wp_slimstat::$options['show_sql_debug'] == 'yes'){
 			self::_show_debug($_sql);
 		}
+		$_sql = apply_filters('slimstat_get_results_sql', $_sql, $_group_by, $_order_by);
+
 		return wp_slimstat::$wpdb->get_results($_sql, ARRAY_A);
 	}
 }

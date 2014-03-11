@@ -11,7 +11,6 @@ class wp_slimstat_admin{
 	 * Init -- Sets things up.
 	 */
 	public static function init(){
-	
 		// This option requires a special treatment
 		if (!empty($_POST['options']['use_separate_menu'])){
 			wp_slimstat::$options['use_separate_menu'] = in_array($_POST['options']['use_separate_menu'], array('yes','no'))?$_POST['options']['use_separate_menu']:'';
@@ -25,8 +24,14 @@ class wp_slimstat_admin{
 			load_textdomain('wp-slimstat', WP_PLUGIN_DIR .'/wp-slimstat/admin/lang/wp-slimstat-en_US.mo');
 		}
 
-		// Hook for WPMU - New blog created
-		add_action('wpmu_new_blog', array(__CLASS__, 'new_blog'), 10, 1);
+		// WPMU - New blog created
+		$active_sitewide_plugins = get_site_option( 'active_sitewide_plugins');
+		if (!empty($active_sitewide_plugins['wp-slimstat/wp-slimstat.php'])){
+			add_action('wpmu_new_blog', array(__CLASS__, 'new_blog'));
+		}
+
+		// WPMU - Blog Deleted
+		add_filter('wpmu_drop_tables', array(__CLASS__, 'drop_tables'), 10, 2);
 
 		// Screen options: hide/show panels to customize your view
 		add_filter('screen_settings', array(__CLASS__, 'screen_settings'), 10, 2);
@@ -81,7 +86,7 @@ class wp_slimstat_admin{
 			include_once(dirname(__FILE__)."/view/wp-slimstat-reports.php");
 			wp_slimstat_reports::init();
 		}
-		
+
 		// AJAX Handlers
 		if (defined('DOING_AJAX') && DOING_AJAX){
 			add_action('wp_ajax_slimstat_load_report', array('wp_slimstat_reports', 'show_report_wrapper'));
@@ -91,31 +96,21 @@ class wp_slimstat_admin{
 	// end init
 
 	/**
-	 * Support for WP MU network activations (experimental)
+	 * Initializes all the tables and options
 	 */
 	public static function activate(){
-		if (function_exists('is_multisite') && is_multisite() && isset($_GET['networkwide']) && ($_GET['networkwide'] == 1)){
-			$blogids = $GLOBALS['wpdb']->get_col($GLOBALS['wpdb']->prepare("
-				SELECT blog_id
-				FROM {$GLOBALS['wpdb']->blogs}
-				WHERE site_id = %d
-				AND deleted = 0
-				AND spam = 0", $GLOBALS['wpdb']->siteid));
-
-			foreach ($blogids as $blog_id){
-				switch_to_blog($blog_id);
-				wp_slimstat::$options = get_option('slimstat_options', array());
-				self::init_environment(true);
-			}
-			restore_current_blog();
-			wp_slimstat::$options = get_option('slimstat_options', array());
-		}
-		else{
-			wp_slimstat::$options = get_option('slimstat_options', array());
-			self::init_environment(true);
-		}
+		wp_slimstat::$options = get_option('slimstat_options', array());
+		self::init_environment(true);
 	}
 	// end activate
+	
+	/**
+	 * Clears the purge cron job
+	 */
+	public static function deactivate(){
+		wp_clear_scheduled_hook('wp_slimstat_purge');
+	}
+	// end deactivate
 
 	/**
 	 * Support for WP MU network activations
@@ -127,12 +122,24 @@ class wp_slimstat_admin{
 		wp_slimstat::$options = get_option('slimstat_options', array());
 	}
 	// end new_blog
+	
+	/**
+	 * Support for WP MU site deletion
+	 */
+	public static function drop_tables($_tables, $_blog_id){
+		$_tables['slim_outbound'] = $GLOBALS['wpdb']->prefix.'slim_outbound';
+		$_tables['slim_stats'] = $GLOBALS['wpdb']->prefix.'slim_stats';
+		
+		return $_tables;
+	}
+	// end new_blog
 
 	/**
 	 * Creates tables, initializes options and schedules purge cron
 	 */
 	public static function init_environment($_activate = true){
-		self::init_tables(wp_slimstat::$wpdb);
+		$my_wpdb = apply_filters('slimstat_custom_wpdb', $GLOBALS['wpdb']);
+		self::init_tables($my_wpdb);
 
 		// Schedule the autopurge hook
 		if (false === wp_next_scheduled('wp_slimstat_purge')){
@@ -170,23 +177,23 @@ class wp_slimstat_admin{
 				referer VARCHAR(2048) DEFAULT '',
 				searchterms VARCHAR(2048) DEFAULT '',
 				resource VARCHAR(2048) DEFAULT '',
-				browser_id MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
+				browser_id SMALLINT UNSIGNED NOT NULL DEFAULT 0,
 				screenres_id MEDIUMINT UNSIGNED NOT NULL DEFAULT 0,
-				content_info_id INT UNSIGNED NOT NULL DEFAULT 0,
+				content_info_id INT UNSIGNED NOT NULL DEFAULT 1,
 				plugins VARCHAR(255) DEFAULT '',
 				notes VARCHAR(2048) DEFAULT '',
 				visit_id INT UNSIGNED NOT NULL DEFAULT 0,
 				dt INT(10) UNSIGNED DEFAULT 0,
 				PRIMARY KEY id (id),
-				FOREIGN KEY fk_browser_id (browser_id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_browsers(browser_id),
-				FOREIGN KEY fk_content_info_id (content_info_id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_content_info(content_info_id),
+				FOREIGN KEY fk_browser_id (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers(browser_id),
+				FOREIGN KEY fk_content_info_id (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info(content_info_id),
 				INDEX dt_idx(dt)
 			) COLLATE utf8_general_ci $use_innodb";
 
 		// A lookup table for browsers can help save some space
 		$browsers_table_sql =
 			"CREATE TABLE IF NOT EXISTS {$GLOBALS['wpdb']->base_prefix}slim_browsers (
-				browser_id MEDIUMINT UNSIGNED NOT NULL auto_increment,
+				browser_id SMALLINT UNSIGNED NOT NULL auto_increment,
 				browser VARCHAR(40) DEFAULT '',
 				version VARCHAR(15) DEFAULT '',
 				platform VARCHAR(15) DEFAULT '',
@@ -246,53 +253,30 @@ class wp_slimstat_admin{
 	// end init_tables
 
 	/**
-	 * Performs some clean-up maintenance (disable cron job).
-	 */
-	public static function deactivate(){
-		// Unschedule the autopurge hook
-		if (function_exists('is_multisite') && is_multisite() && isset($_GET['networkwide']) && ($_GET['networkwide'] == 1)){
-			$blogids = $GLOBALS['wpdb']->get_col($GLOBALS['wpdb']->prepare("
-				SELECT blog_id
-				FROM %s
-				WHERE site_id = %d
-				AND deleted = 0
-				AND spam = 0", $GLOBALS['wpdb']->blogs, $GLOBALS['wpdb']->siteid));
-
-			foreach ($blogids as $blog_id) {
-				switch_to_blog($blog_id);
-				wp_clear_scheduled_hook('wp_slimstat_purge');
-			}
-			restore_current_blog();
-		}
-		else{
-			wp_clear_scheduled_hook('wp_slimstat_purge');
-		}
-	}
-	// end deactivate
-
-	/**
 	 * Updates the table structure, and make it backward-compatible with all the previous versions released.
 	 */
 	public static function update_tables_and_options($_activate = true){
+		$my_wpdb = apply_filters('slimstat_custom_wpdb', $GLOBALS['wpdb']);
+		
 		// Create initial structure or missing tables
 		if (!$_activate) self::init_environment(false);
 
 		// --- Updates for version 3.1 ---
 		if (version_compare(wp_slimstat::$options['version'], '3.1', '<')){
-			wp_slimstat::$wpdb->query("DROP TABLE IF EXISTS {$GLOBALS['wpdb']->base_prefix}slim_countries");
+			$my_wpdb->query("DROP TABLE IF EXISTS {$GLOBALS['wpdb']->base_prefix}slim_countries");
 		}
 		// --- END: Updates for version 3.1 ---
 		
 		// --- Updates for version 3.2 ---
 		if (version_compare(wp_slimstat::$options['version'], '3.2', '<')){
-			wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats MODIFY country VARCHAR(16) DEFAULT ''");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats MODIFY country VARCHAR(16) DEFAULT ''");
 		}
 		// --- END: Updates for version 3.2 ---
 
 		// --- Updates for version 3.3 ---
 		if (version_compare(wp_slimstat::$options['version'], '3.3', '<')){
 			$user_agent_exists = false;
-			$table_structure = wp_slimstat::$wpdb->get_results("SHOW COLUMNS FROM {$GLOBALS['wpdb']->base_prefix}slim_browsers", ARRAY_A);
+			$table_structure = $my_wpdb->get_results("SHOW COLUMNS FROM {$GLOBALS['wpdb']->base_prefix}slim_browsers", ARRAY_A);
 
 			foreach($table_structure as $a_row){
 				if ($a_row['Field'] == 'user_agent'){
@@ -301,23 +285,25 @@ class wp_slimstat_admin{
 				}
 			}
 			if (!$user_agent_exists){
-				wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers ADD COLUMN user_agent VARCHAR(2048) DEFAULT '' AFTER type");
+				$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers ADD COLUMN user_agent VARCHAR(2048) DEFAULT '' AFTER type");
 			}
 		}
 		// --- END: Updates for version 3.3 ---
 	
 		// --- Updates for version 3.5.6 ---
 		if (version_compare(wp_slimstat::$options['version'], '3.5.6', '<')){
-			wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD INDEX dt_idx (dt)");
-			wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD INDEX odt_idx (dt)");
-			wp_slimstat::$wpdb->query("DELETE tso FROM {$GLOBALS['wpdb']->prefix}slim_outbound tso LEFT JOIN {$GLOBALS['wpdb']->prefix}slim_stats ts ON tso.id = ts.id WHERE ts.id IS NULL");
-			wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD CONSTRAINT fk_id FOREIGN KEY (id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_stats (id) ON UPDATE CASCADE ON DELETE CASCADE");
-			wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
-			wp_slimstat::$wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_content_info_id FOREIGN KEY (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info (content_info_id)");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD INDEX dt_idx (dt)");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats MODIFY content_info_id INT UNSIGNED NOT NULL DEFAULT 1");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_content_info MODIFY content_info_id INT UNSIGNED");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD INDEX odt_idx (dt)");
+			$my_wpdb->query("DELETE tso FROM {$GLOBALS['wpdb']->prefix}slim_outbound tso LEFT JOIN {$GLOBALS['wpdb']->prefix}slim_stats ts ON tso.id = ts.id WHERE ts.id IS NULL");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD CONSTRAINT fk_id FOREIGN KEY (id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_stats (id) ON UPDATE CASCADE ON DELETE CASCADE");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_content_info_id FOREIGN KEY (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info (content_info_id)");
 		}
 		// --- END: Updates for version 3.5.6 ---
 		
-		// New option 'version' added in version 2.8 - Keep it up-to-date
+		// Now we can update the version stored in the database
 		if (!isset(wp_slimstat::$options['version']) || wp_slimstat::$options['version'] != wp_slimstat::$version){
 			wp_slimstat::$options['version'] = wp_slimstat::$version;
 		}

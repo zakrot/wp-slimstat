@@ -422,6 +422,11 @@ class wp_slimstat{
 		// Something went wrong during the insert
 		if (empty(self::$stat['id'])){
 			self::$stat['id'] = -215;
+			
+			// Attempt to init the environment (new blog in a MU network?)
+			include_once(WP_PLUGIN_DIR.'/wp-slimstat/admin/wp-slimstat-admin.php');
+			wp_slimstat_admin::init_environment(true);
+			
 			return $_argument;
 		}
 
@@ -1011,7 +1016,7 @@ class wp_slimstat{
 	 */
 	public static function init_options(){
 		$options = array(
-			'version' => 0,
+			'version' => self::$version,
 			'secret' => get_option('slimstat_secret', md5(time())),
 			'show_admin_notice' => 0,
 			

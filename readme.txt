@@ -24,7 +24,7 @@ The most accurate real-time statistics plugin for WordPress. Visit our [official
 * Read all the [reviews](http://wordpress.org/support/view/plugin-reviews/wp-slimstat) and feel free to post your own
 
 = Requirements =
-* WordPress 3.8+ (it may not work on *large* multisite environments)
+* WordPress 3.8+
 * PHP 5.3+
 * MySQL 5.0.3+
 * At least 5 MB of free web space
@@ -272,12 +272,16 @@ foreach ($results...`
 == Changelog ==
 
 = 3.5.6 =
+* [Note] Do you have WP MU and would like to get reports for your entire (small) network? We're finally working on something that might make you happy :)
 * [Update] Purge functionality now works with different timezones 
 * [Update] Added indexes, foreign keys and other constraints to our tables, in order to improve performance (thank you, Morgan)
 * [Update] [Browscap](http://browscap.org/) has been updated to version 5024, released on March 2, 2014
+* [Update] WP SlimStat now works on network installs of *any* size. And yes, you can network activate it without worrying about timeouts or perfomance issues!
 * [Fix] Originating IP addresses were not being "anonymized" (thank you, [carbeck](http://wordpress.org/support/topic/still-problems-with-ip-obfuscation-on-my-32-bit-server))
 * [Fix] Width of column in Edit Posts (thank you, [27pchrisl](https://github.com/getusedtoit/wp-slimstat/pull/2))
 * [Fix] XSS Vulnerability (exploitable only in rare circumstances and on site with very little pageviews) in Overview (thank you, [lnxg33k](https://github.com/getusedtoit/wp-slimstat/issues/3))
+* [Fix] When a site in a network (MU) environment was deleted, WP SlimStat's tables weren't removed
+* [Fix] In a Network (MU) environment, WP SlimStat's tables were being created even if the plugin was NOT network activated
 * [Fix] A conflict with some unknown plugin causing all the users to be mistaken for spammers (thank you, [iinnovations](http://wordpress.org/support/topic/stats-lost-after-apache2-reload))
 * [Fix] Missing space in SQL query was the cause of empty reports in some cases (thank you, [psn](http://wordpress.org/support/topic/no-data-for-certain-boxes))
 * [Fix] Warning on undefined index when trying to create a new blog in a MU environment (thank you, [Sam Brodie](http://wordpress.org/support/topic/undefined-index-error-in-version))
