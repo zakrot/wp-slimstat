@@ -3,7 +3,7 @@
 Plugin Name: WP SlimStat
 Plugin URI: http://wordpress.org/plugins/wp-slimstat/
 Description: The most accurate real-time statistics plugin for WordPress
-Version: 3.5.6
+Version: 3.5.7
 Author: Camu
 Author URI: http://slimstat.getused.to.it/
 */
@@ -11,7 +11,7 @@ Author URI: http://slimstat.getused.to.it/
 if (!empty(wp_slimstat::$options)) return true;
 
 class wp_slimstat{
-	public static $version = '3.5.6';
+	public static $version = '3.5.7';
 	public static $options = array();
 	
 	public static $wpdb = '';
@@ -674,42 +674,84 @@ class wp_slimstat{
 	 * Retrieves some information about the user agent; relies on browscap.php database (included)
 	 */
 	protected static function _get_browser(){
-		// Load cache
-		@include_once(plugin_dir_path( __FILE__ ).'databases/browscap.php');
-
-		$browser = array('browser' => 'Default Browser', 'version' => '1', 'platform' => 'unknown', 'css_version' => 1, 'type' => 1);
-		if (empty($slimstat_patterns) || !is_array($slimstat_patterns)) return $browser;
-
-		$user_agent = isset($_SERVER['HTTP_USER_AGENT'])?$_SERVER['HTTP_USER_AGENT']:'';
+		$browser = array('browser' => 'Default Browser', 'version' => '', 'platform' => 'unknown', 'css_version' => 1, 'type' => 1);
 		$search = array();
-		foreach ($slimstat_patterns as $key => $pattern){
-			if (preg_match($pattern . 'i', $user_agent)){
-				$search = $value = $search + $slimstat_browsers[$key];
-				while (array_key_exists(3, $value) && $value[3]) {
-					$value = $slimstat_browsers[$value[3]];
-					$search += $value;
-				}
-				break;
+
+		for($idx_cache = 1; $idx_cache <= 5; $idx_cache++){
+			@include(plugin_dir_path( __FILE__ )."databases/browscap-$idx_cache.php");
+
+			// Automatically detect the useragent
+			if (!isset($_SERVER['HTTP_USER_AGENT'])){
+				return $browser;
 			}
-		}
 
-		// If a meaningful match was found, let's define some keys
-		if ($search[5] != 'Default Browser' && $search[5] != 'unknown'){
-			$browser['browser'] = $search[5];
-			$browser['version'] = intval($search[6]);
-			$browser['platform'] = strtolower($search[9]);
-			$browser['css_version'] = $search[28];
-			$browser['user_agent'] = $user_agent;
+			foreach ($browscap_patterns as $pattern => $pattern_data){
+				if (preg_match($pattern . 'i', $_SERVER['HTTP_USER_AGENT'], $matches)){
+					if (1 == count($matches)) {
+						$key = $pattern_data;
+						$simple_match = true;
 
-			// browser Types:
-			//		0: regular
-			//		1: crawler
-			//		2: mobile
-			//		3: syndication reader
-			if ($search[25] == 'true') $browser['type'] = 2;
-			elseif ($search[26] == 'true') $browser['type'] = 3;
-			elseif ($search[27] != 'true') $browser['type'] = 0;
-			if ($browser['version'] != 0 || $browser['type'] != 0) return $browser;
+					}
+					else{
+						$pattern_data = unserialize($pattern_data);
+						array_shift($matches);
+						
+						$match_string = '@' . implode('|', $matches);
+
+						if (!isset($pattern_data[$match_string])){
+							continue;
+						}
+
+						$key = $pattern_data[$match_string];
+
+						$simple_match = false;
+					}
+
+					$search = array(
+						$_SERVER['HTTP_USER_AGENT'],
+						trim(strtolower($pattern), '@'),
+						self::_preg_unquote($pattern, $simple_match ? false : $matches)
+					);
+
+					$search = $value = $search + unserialize($browscap_browsers[$key]);
+
+					while (array_key_exists(3, $value)) {
+						$value = unserialize($browscap_browsers[$value[3]]);
+						$search += $value;
+					}
+
+					if (!empty($search[3])) {
+						$search[3] = $browscap_userAgents[$search[3]];
+					}
+
+					break;
+				}
+			}
+			unset($browscap_properties);
+			unset($browscap_browsers);
+			unset($browscap_userAgents);
+			unset($browscap_patterns);
+
+			if (!empty($search) && $search[5] != 'Default Browser' && $search[5] != 'unknown'){
+				$browser['browser'] = $search[5];
+				$browser['version'] = intval($search[6]);
+				$browser['platform'] = strtolower($search[9]);
+				$browser['css_version'] = $search[28];
+				$browser['user_agent'] =  $search[0];
+
+				// browser Types:
+				//		0: regular
+				//		1: crawler
+				//		2: mobile
+				//		3: syndication reader
+				if ($search[25] == 'true') $browser['type'] = 2;
+				elseif ($search[26] == 'true') $browser['type'] = 3;
+				elseif ($search[27] != 'true') $browser['type'] = 0;
+
+				if ($browser['version'] != 0 || $browser['type'] != 0){
+					return $browser;
+				}
+			}
 		}
 
 		// Let's try with the heuristic approach
@@ -832,6 +874,25 @@ class wp_slimstat{
 		return $browser;
 	}
 	// end _get_browser
+
+	/**
+	 * Helper function for get_browser [courtesy of: GaretJax/PHPBrowsCap]
+	 */
+	protected static function _preg_unquote($pattern, $matches){
+		$search = array('\\@', '\\.', '\\\\', '\\+', '\\[', '\\^', '\\]', '\\$', '\\(', '\\)', '\\{', '\\}', '\\=', '\\!', '\\<', '\\>', '\\|', '\\:', '\\-', '.*', '.', '\\?');
+		$replace = array('@', '\\?', '\\', '+', '[', '^', ']', '$', '(', ')', '{', '}', '=', '!', '<', '>', '|', ':', '-', '*', '?', '.');
+
+		$result = substr(str_replace($search, $replace, $pattern), 2, -2);
+
+		if (!empty($matches)){
+			foreach ($matches as $one_match){
+				$num_pos = strpos($result, '(\d)');
+				$result = substr_replace($result, $one_match, $num_pos, 4);
+			}
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Parses the UserAgent string to get the operating system code

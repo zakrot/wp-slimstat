@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: analytics, tracking, reports, analyze, wassup, geolocation, online users, spider, tracker, pageviews, stats, maxmind, statistics, statpress
 Requires at least: 3.8
 Tested up to: 3.8.1
-Stable tag: 3.5.6
+Stable tag: 3.5.7
 
 == Description ==
 The most accurate real-time statistics plugin for WordPress. Visit our [official site](http://slimstat.getused.to.it/) for more information, or find us on [GitHub](https://github.com/getusedtoit/wp-slimstat) (psst, we have Flattr enabled, there: star our project to donate).
@@ -29,7 +29,7 @@ The most accurate real-time statistics plugin for WordPress. Visit our [official
 * MySQL 5.0.3+
 * At least 5 MB of free web space
 * At least 5 MB of free DB space
-* At least 25 Mb of free PHP memory for the tracker
+* At least 4 Mb of free PHP memory for the tracker (peak memory usage)
 * IE9+ or any browser supporting HTML5, to access the reports
 
 = Premium Add-ons =
@@ -270,6 +270,12 @@ foreach ($results...`
 5. **Responsive layout** - Keep an eye on your reports on the go
 
 == Changelog ==
+
+= 3.5.7 =
+* [Note] Browscap, the third party database we use to detect user agents, has more than doubled its size in the last few months (which is great: it means the project is actively maintained). In some cases, this was causing WP SlimStat to exceed the maximum amount of memory assigned to PHP. By breaking the database into multiple files, we were able to lower the plugin's peak memory usage from 20 to 2 MB. Enjoy!
+* [Fix] Delete ALL data under Maintenance tab was not working (thank you, [Ronan](http://wordpress.org/support/topic/maintence-question))
+* [Fix] No more PHP memory issues (thank you, [Roquefort](http://wordpress.org/support/topic/slimstat-causes-consistent-404s-on-my-site))
+* [Fix] Visitors had some empty reports (thank you, [psn](http://wordpress.org/support/topic/some-empty-report-in-visitors-page))
 
 = 3.5.6 =
 * [Note] Do you have WP MU and would like to get reports for your entire (small) network? We're finally working on something that might make you happy :)

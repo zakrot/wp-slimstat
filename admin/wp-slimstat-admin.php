@@ -5,7 +5,7 @@ class wp_slimstat_admin{
 	public static $config_url = '';
 	public static $faulty_fields = array();
 	
-	protected static $admin_notice = "Our partner <a href='https://github.com/jsdelivr/jsdelivr/issues/397' target='_blank'>jsDelivr</a> is a non-profit CDN project, and it relies on sponsors and the community for help. Feel free to <a href='https://github.com/jsdelivr/jsdelivr/issues/397' target='_blank'>contact them</a> if you would like to contribute!";
+	protected static $admin_notice = "<a href='http://browscap.org/'>Browscap</a>, the third party database we use to detect user agents, has more than doubled its size in the last few months (which is great: it means the project is actively maintained). In some cases, this was causing WP SlimStat to exceed the maximum amount of memory assigned to PHP. By breaking the database into multiple files, we were able to lower the plugin's peak memory usage from 20 to 2 MB. Enjoy!";
 	
 	/**
 	 * Init -- Sets things up.
@@ -147,7 +147,6 @@ class wp_slimstat_admin{
 		}
 
 		// If this function hasn't been called during the upgrade process, make sure to init and update all the options
-		wp_slimstat::$options = wp_slimstat::init_options();
 		if ($_activate){
 			self::update_tables_and_options(true);
 		}
@@ -302,6 +301,13 @@ class wp_slimstat_admin{
 			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_content_info_id FOREIGN KEY (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info (content_info_id)");
 		}
 		// --- END: Updates for version 3.5.6 ---
+		
+		// --- Updates for version 3.5.7 ---
+		if (version_compare(wp_slimstat::$options['version'], '3.5.7', '<')){
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers MODIFY browser_id SMALLINT UNSIGNED");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
+		}
+		// --- END: Updates for version 3.5.7 ---
 		
 		// Now we can update the version stored in the database
 		if (!isset(wp_slimstat::$options['version']) || wp_slimstat::$options['version'] != wp_slimstat::$version){
