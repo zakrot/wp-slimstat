@@ -153,7 +153,7 @@ class wp_slimstat{
 			$screenres = apply_filters('slimstat_filter_pageview_screenres', $screenres, self::$stat);
 
 			// Now we insert the new screen resolution in the lookup table, if it doesn't exist
-			self::$stat['screenres_id'] = self::maybe_insert_row($screenres, $GLOBALS['wpdb']->base_prefix.'slim_screenres', 'screenres_id');
+			self::$stat['screenres_id'] = self::maybe_insert_row($screenres, $GLOBALS['wpdb']->base_prefix.'slim_screenres', 'screenres_id', array());
 		}
 		self::$stat['plugins'] = !empty(self::$data_js['pl'])?substr(str_replace('|', ',', self::$data_js['pl']), 0, -1):'';
 
@@ -415,8 +415,8 @@ class wp_slimstat{
 		}
 
 		// Now let's save this information in the database
-		if (!empty($content_info)) self::$stat['content_info_id'] = self::maybe_insert_row($content_info, $GLOBALS['wpdb']->base_prefix.'slim_content_info', 'content_info_id');
-		self::$stat['browser_id'] = self::maybe_insert_row($browser, $GLOBALS['wpdb']->base_prefix.'slim_browsers', 'browser_id');
+		if (!empty($content_info)) self::$stat['content_info_id'] = self::maybe_insert_row($content_info, $GLOBALS['wpdb']->base_prefix.'slim_content_info', 'content_info_id', array());
+		self::$stat['browser_id'] = self::maybe_insert_row($browser, $GLOBALS['wpdb']->base_prefix.'slim_browsers', 'browser_id', array('user_agent' => $browser['user_agent']));
 		self::$stat['id'] = self::insert_row(self::$stat, $GLOBALS['wpdb']->prefix.'slim_stats');
 
 		// Something went wrong during the insert
@@ -727,11 +727,10 @@ class wp_slimstat{
 					break;
 				}
 			}
-			unset($browscap_properties);
 			unset($browscap_browsers);
 			unset($browscap_userAgents);
 			unset($browscap_patterns);
-
+ 
 			if (!empty($search) && $search[5] != 'Default Browser' && $search[5] != 'unknown'){
 				$browser['browser'] = $search[5];
 				$browser['version'] = intval($search[6]);
@@ -1021,16 +1020,18 @@ class wp_slimstat{
 	/** 
 	 * Stores the information (array) in the appropriate table (if needed) and returns the corresponding ID
 	 */
-	public static function maybe_insert_row($_data = array(), $_table = '', $_id_column = ''){
+	public static function maybe_insert_row($_data = array(), $_table = '', $_id_column = '', $_not_unique = array()){
 		if (empty($_data) || empty($_id_column) || empty($_table)) return -1;
 
 		$select_sql = "SELECT $_id_column FROM $_table WHERE ";
-		foreach ($_data as $a_key => $a_value) $select_sql .= "$a_key = %s AND ";
-		$select_sql = self::$wpdb->prepare(substr($select_sql, 0, -5), $_data);
+		$data = array_diff($_data, $_not_unique);
+		foreach ($data as $a_key => $a_value){
+			$select_sql .= "$a_key = %s AND ";
+		}
+		$select_sql = self::$wpdb->prepare(substr($select_sql, 0, -5), $data);
 
 		// Let's see if this row is already in our lookup table
 		$id = self::$wpdb->get_var($select_sql);
-
 		if (empty($id)){
 			$id = self::insert_row($_data, $_table);
 
@@ -1047,15 +1048,10 @@ class wp_slimstat{
 	 */
 	public static function insert_row($_data = array(), $_table = ''){
 		if (empty($_data) || empty($_table)) return -1;
-		
-		$update_on_duplicate = array();
-		foreach (array_keys($_data) as $a_key){
-			$update_on_duplicate[] .= "$a_key = %s";
-		}
 
 		self::$wpdb->query(self::$wpdb->prepare("
 			INSERT IGNORE INTO $_table (".implode(", ", array_keys($_data)).') 
-			VALUES ('.substr(str_repeat('%s,', count($_data)), 0, -1).') ON DUPLICATE KEY UPDATE '.implode(',', $update_on_duplicate), array_merge($_data, array_values($_data))));
+			VALUES ('.substr(str_repeat('%s,', count($_data)), 0, -1).")", $_data));
 
 		return intval(self::$wpdb->insert_id);
 	}

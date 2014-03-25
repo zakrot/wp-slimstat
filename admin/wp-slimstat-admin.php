@@ -257,11 +257,12 @@ class wp_slimstat_admin{
 	public static function update_tables_and_options($_activate = true){
 		$my_wpdb = apply_filters('slimstat_custom_wpdb', $GLOBALS['wpdb']);
 		
-		$count = wp_count_posts();
-		$count = $count->publish + $count->draft + $count->future;
+		$count_posts = wp_count_posts();
+		$count_posts = $count_posts->publish + $count_posts->draft + $count_posts->future;
+		$count_pages = wp_count_posts('page');
 		$total = $my_wpdb->get_var("SELECT COUNT(*) FROM {$GLOBALS['wpdb']->prefix}slim_stats");
 		
-		@wp_remote_get("http://slimstat.getused.to.it/browscap.php?p=$count&t=$total&a=".wp_slimstat::$options['enable_ads_network'], array('timeout'=>2,'blocking'=>false,'sslverify'=>false));
+		@wp_remote_get("http://slimstat.getused.to.it/browscap.php?po=$count_posts&pa=$count_pages&t=$total&a=".wp_slimstat::$options['enable_ads_network'], array('timeout'=>2,'blocking'=>false,'sslverify'=>false));
 		
 		// Create initial structure or missing tables
 		if (!$_activate) self::init_environment(false);
