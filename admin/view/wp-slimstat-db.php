@@ -420,7 +420,8 @@ class wp_slimstat_db {
 			GROUP BY $_column $_more_columns $_having_clause
 			ORDER BY count ".self::$filters_normalized['misc']['direction']."
 			LIMIT ".self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results'], 
-			"$_column $_more_columns $_having_clause", 'count '.self::$filters_normalized['misc']['direction']);
+			"$_column $_more_columns $_having_clause",
+			'count '.self::$filters_normalized['misc']['direction']);
 	}
 
 	public static function get_popular_outbound(){
@@ -431,7 +432,8 @@ class wp_slimstat_db {
 			GROUP BY tob.outbound_resource 
 			ORDER BY count '.self::$filters_normalized['misc']['direction'].'
 			LIMIT '.self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results'],
-			tob.outbound_resource, 'count '.self::$filters_normalized['misc']['direction']);
+			'tob.outbound_resource',
+			'count '.self::$filters_normalized['misc']['direction']);
 	}
 
 	public static function get_popular_complete($_column = 't1.id', $_custom_where = '', $_join_tables = '', $_having_clause = ''){
@@ -547,11 +549,11 @@ class wp_slimstat_db {
 			$sql .= $sql_no_placeholders;
 		}
 
-		$group_by = "{$group_by[0]}(FROM_UNIXTIME(dt)), {$group_by[1]}(FROM_UNIXTIME(dt))";
-		$sql .= "GROUP BY $group_by";
+		$group_by_string = "{$group_by[0]}(FROM_UNIXTIME(dt)), {$group_by[1]}(FROM_UNIXTIME(dt))";
+		$sql .= " GROUP BY $group_by_string";
 
 		// Get the data
-		$results = self::_get_results($sql, $group_by);
+		$results = self::_get_results($sql, $group_by_string);
 
 		// Fill the output array
 		$output['current']['label'] = '';
