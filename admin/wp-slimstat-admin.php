@@ -5,7 +5,7 @@ class wp_slimstat_admin{
 	public static $config_url = '';
 	public static $faulty_fields = array();
 	
-	protected static $admin_notice = "Version 3.5.7 shipped with a bug that was affecting the rendering of most charts. This update fixes this and other glitched. Please contact our <a href='http://support.getused.to.it/' target='_blank'>support team</a>, if you have any questions.";
+	protected static $admin_notice = ''; // "Version 3.5.7 shipped with a bug that was affecting the rendering of most charts. This update fixes this and other glitched. Please contact our <a href='http://support.getused.to.it/' target='_blank'>support team</a>, if you have any questions.";
 	
 	/**
 	 * Init -- Sets things up.
@@ -43,7 +43,7 @@ class wp_slimstat_admin{
 		add_filter('plugin_action_links_wp-slimstat/wp-slimstat.php', array(__CLASS__, 'plugin_action_links'), 10, 2);
 
 		// Display a notice that hightlights this version's features
-		if (wp_slimstat::$options['show_admin_notice'] != wp_slimstat::$version && !empty($_GET['page']) && strpos($_GET['page'], 'wp-slim') !== false) {
+		if (!empty($_GET['page']) && strpos($_GET['page'], 'wp-slim') !== false && !empty(self::$admin_notice) && wp_slimstat::$options['show_admin_notice'] != wp_slimstat::$version) {
 			add_action('admin_notices', array(__CLASS__, 'show_admin_notice'));
 		}
 
@@ -304,10 +304,18 @@ class wp_slimstat_admin{
 		
 		// --- Updates for version 3.5.7 ---
 		if (version_compare(wp_slimstat::$options['version'], '3.5.7', '<')){
-			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers MODIFY browser_id SMALLINT UNSIGNED");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers MODIFY browser_id SMALLINT UNSIGNED NOT NULL auto_increment");
 			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
 		}
 		// --- END: Updates for version 3.5.7 ---
+		
+		// --- Updates for version 3.5.9 ---
+		if (version_compare(wp_slimstat::$options['version'], '3.5.9', '<')){
+			$my_wpdb->query("DELETE FROM {$GLOBALS['wpdb']->prefix}slim_stats WHERE browser_id <= 0");
+			$my_wpdb->query("DELETE FROM {$GLOBALS['wpdb']->base_prefix}slim_browsers WHERE browser_id <= 0");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers MODIFY browser_id SMALLINT UNSIGNED NOT NULL auto_increment");
+		}
+		// --- END: Updates for version 3.5.9 ---
 	
 		// Now we can update the version stored in the database
 		if (empty(wp_slimstat::$options['version']) || wp_slimstat::$options['version'] != wp_slimstat::$version){
