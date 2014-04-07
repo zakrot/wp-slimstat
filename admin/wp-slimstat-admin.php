@@ -184,8 +184,8 @@ class wp_slimstat_admin{
 				visit_id INT UNSIGNED NOT NULL DEFAULT 0,
 				dt INT(10) UNSIGNED DEFAULT 0,
 				PRIMARY KEY id (id),
-				FOREIGN KEY fk_browser_id (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers(browser_id),
-				FOREIGN KEY fk_content_info_id (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info(content_info_id),
+				CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers(browser_id),
+				CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}content_info_id FOREIGN KEY (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info(content_info_id),
 				INDEX dt_idx(dt)
 			) COLLATE utf8_general_ci $use_innodb";
 
@@ -238,7 +238,7 @@ class wp_slimstat_admin{
 				id INT UNSIGNED NOT NULL DEFAULT 0,
 				dt INT(10) UNSIGNED DEFAULT 0,
 				PRIMARY KEY (outbound_id),
-				FOREIGN KEY fk_id (id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_stats(id) ON UPDATE CASCADE ON DELETE CASCADE,
+				CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}slim_stats_id FOREIGN KEY (id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_stats(id) ON UPDATE CASCADE ON DELETE CASCADE,
 				INDEX odt_idx(dt)
 			) COLLATE utf8_general_ci $use_innodb";
 
@@ -296,16 +296,16 @@ class wp_slimstat_admin{
 			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_content_info MODIFY content_info_id INT UNSIGNED");
 			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD INDEX odt_idx (dt)");
 			$my_wpdb->query("DELETE tso FROM {$GLOBALS['wpdb']->prefix}slim_outbound tso LEFT JOIN {$GLOBALS['wpdb']->prefix}slim_stats ts ON tso.id = ts.id WHERE ts.id IS NULL");
-			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD CONSTRAINT fk_id FOREIGN KEY (id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_stats (id) ON UPDATE CASCADE ON DELETE CASCADE");
-			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
-			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_content_info_id FOREIGN KEY (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info (content_info_id)");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_outbound ADD CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}id FOREIGN KEY (id) REFERENCES {$GLOBALS['wpdb']->prefix}slim_stats (id) ON UPDATE CASCADE ON DELETE CASCADE");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}content_info_id FOREIGN KEY (content_info_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_content_info (content_info_id)");
 		}
 		// --- END: Updates for version 3.5.6 ---
 		
 		// --- Updates for version 3.5.7 ---
 		if (version_compare(wp_slimstat::$options['version'], '3.5.7', '<')){
 			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->base_prefix}slim_browsers MODIFY browser_id SMALLINT UNSIGNED NOT NULL auto_increment");
-			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
+			$my_wpdb->query("ALTER TABLE {$GLOBALS['wpdb']->prefix}slim_stats ADD CONSTRAINT fk_{$GLOBALS['wpdb']->prefix}browser_id FOREIGN KEY (browser_id) REFERENCES {$GLOBALS['wpdb']->base_prefix}slim_browsers (browser_id)");
 		}
 		// --- END: Updates for version 3.5.7 ---
 		
