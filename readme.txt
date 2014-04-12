@@ -14,7 +14,7 @@ The most accurate real-time statistics plugin for WordPress. Visit our [official
 * Integrates with WooCommerce and other e-commerce plugins
 * Compatible with W3 Total Cache, WP SuperCache and HyperCache
 * The most accurate IP geolocation, browser and platform detection ever seen (courtesy of [MaxMind](http://www.maxmind.com/) and [Browscap](http://browscap.org))
-* Available in multiple languages: English, Chinese (沐熙工作室), Farsi ([Dean](http://www.mangallery.net)), French (Michael Bastin, Jean-Michel Venet), German (TechnoViel), Italian, Portuguese, Russian ([Vitaly](http://www.visbiz.org/)), Spanish, Swedish (Per Soderman). Is your language is missing or incomplete? [Contact Us](http://slimstat.getused.to.it/contact-us/) if you would like to share your localization.
+* Available in multiple languages: English, Chinese (沐熙工作室), Farsi ([Dean](http://www.mangallery.net)), French (Michael Bastin, Jean-Michel Venet, Yves Pouplard), German (TechnoViel), Italian, Portuguese, Russian ([Vitaly](http://www.visbiz.org/)), Spanish ([WebHostingHub](http://www.webhostinghub.com/)), Swedish (Per Soderman). Is your language is missing or incomplete? [Contact Us](http://slimstat.getused.to.it/contact-us/) if you would like to share your localization.
 * World Map that works on your mobile device, too (courtesy of [amMap](http://www.ammap.com/)).
 
 = What are people saying about WP SlimStat? =
@@ -273,6 +273,7 @@ foreach ($results...`
 
 = 3.5.9 =
 * [Fix] New user agents were not being recorded correctly in some cases (thank you, [fberzau](http://wordpress.org/support/topic/browser-and-os-stats-not-working))
+* [Fix] Bug affecting the plugin in MU environments (thank you, [27pchrisl](https://github.com/getusedtoit/wp-slimstat/commit/00e389aaa4fc425b8b8ba829a9f6c66f5ba268c8))
 * [Fix] Filters have a more consistent behavior and are now easier to extend via third party add-ons
 * [Fix] Date filters were being set to January 1, 1970 under certain circumstances (thank you, Russell and [uewinfo_frm](http://wordpress.org/support/topic/a-problem-for-mouse-hover-on-google-chrome))
 * [Fix] Our premium Export to Excel add-on was only returning the first 20 records of each report

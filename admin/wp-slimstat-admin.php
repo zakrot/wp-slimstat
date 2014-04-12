@@ -36,9 +36,6 @@ class wp_slimstat_admin{
 		// Screen options: hide/show panels to customize your view
 		add_filter('screen_settings', array(__CLASS__, 'screen_settings'), 10, 2);
 
-		// Footer links
-		add_filter('admin_footer_text',  array(__CLASS__, 'footer_admin'));
-
 		// Show the activation and config links, if the network is not too large
 		add_filter('plugin_action_links_wp-slimstat/wp-slimstat.php', array(__CLASS__, 'plugin_action_links'), 10, 2);
 
@@ -799,12 +796,6 @@ class wp_slimstat_admin{
 		);
 	}
 	// end contextual_help
-
-	// Footer link
-	public static function footer_admin($_original_footer = ''){
-		$thank_you_footer = apply_filters('slimstat_footer_thank_you', __('And for keeping an eye on your visitors with <a href="http://slimstat.getused.to.it/">WP SlimStat</a>.','wp-slimstat'));
-		return $_original_footer.' '.$thank_you_footer;
-	}
 
 	/**
 	 * Creates a table in the database

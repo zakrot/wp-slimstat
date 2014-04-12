@@ -998,8 +998,10 @@ class wp_slimstat{
 			update_option('slimstat_visit_id', self::$stat['visit_id']);
 
 			$is_set_cookie = apply_filters('slimstat_set_visit_cookie', true);
-			if ($is_set_cookie)
+			if ($is_set_cookie){
 				@setcookie('slimstat_tracking_code', self::$stat['visit_id'].'.'.md5(self::$stat['visit_id'].self::$options['secret']), time()+self::$options['session_duration'], COOKIEPATH);
+			}
+
 		}
 		elseif ($identifier > 0){
 			self::$stat['visit_id'] = $identifier;
