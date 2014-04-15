@@ -5,7 +5,7 @@ class wp_slimstat_admin{
 	public static $config_url = '';
 	public static $faulty_fields = array();
 	
-	protected static $admin_notice = ''; // "Version 3.5.7 shipped with a bug that was affecting the rendering of most charts. This update fixes this and other glitched. Please contact our <a href='http://support.getused.to.it/' target='_blank'>support team</a>, if you have any questions.";
+	protected static $admin_notice = "We are honored to see that WP SlimStat is being pirated and sold for $90 a pop as Keyword Swarm. It means that our product is not <a href='http://wordpress.org/support/topic/overrated-1' target='_blank'>as bad as someone claims it to be</a>. But please save your money and keep using the original free product you've been enjoying <a href='http://www.bloggingpro.com/archives/2006/05/23/slimstat-and-wp-slimstat/' target='_blank'>for 8 years now</a>. And if your know people who have purchased the knock off, tell them to go get their refund!";
 	
 	/**
 	 * Init -- Sets things up.

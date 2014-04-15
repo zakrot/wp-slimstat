@@ -329,7 +329,7 @@ class wp_slimstat_db {
 	// The following methods retrieve the information from the database
 
 	public static function count_bouncing_pages(){
-		return intval(wp_slimstat::$wpdb->get_var('
+		return intval(self::get_var('
 			SELECT COUNT(*) counthits
 				FROM (
 					SELECT t1.resource
@@ -337,11 +337,12 @@ class wp_slimstat_db {
 					WHERE t1.visit_id <> 0 AND t1.resource <> "" AND tci.content_type <> "404" '.self::$sql_filters['where'].' '.self::$sql_filters['where_time_range'].'
 					GROUP BY visit_id
 					HAVING COUNT(visit_id) = 1
-				) as ts1'));
+				) as ts1',
+			'SUM(counthits) AS counthits'));
 	}
 
 	public static function count_exit_pages(){
-		return intval(wp_slimstat::$wpdb->get_var('
+		return intval(self::get_var('
 			SELECT COUNT(*) counthits
 				FROM (
 					SELECT resource, visit_id, dt
@@ -349,33 +350,37 @@ class wp_slimstat_db {
 					WHERE visit_id > 0 AND resource <> "" '.self::$sql_filters['where'].' '.self::$sql_filters['where_time_range'].'
 					GROUP BY visit_id
 					HAVING dt = MAX(dt)
-				) AS ts1'));
+				) AS ts1',
+			'SUM(counthits) AS counthits'));
 	}
 
 	public static function count_records($_where_clause = '1=1', $_distinct_column = '*', $_use_filters = true, $_use_date_filters = true, $_join_tables = ''){
 		$column = ($_distinct_column != '*')?"DISTINCT $_distinct_column":$_distinct_column;
-		return intval(wp_slimstat::$wpdb->get_var("
+		return intval(self::get_var("
 			SELECT COUNT($column) counthits
 			FROM {$GLOBALS['wpdb']->prefix}slim_stats t1 ".($_use_filters?self::$sql_filters['from']['all_other_tables']:'').' '.self::_add_filters_to_sql_from($_where_clause.$_join_tables).'
-			WHERE '.(!empty($_where_clause)?$_where_clause:'1=1').' '.($_use_filters?self::$sql_filters['where']:'').' '.($_use_date_filters?self::$sql_filters['where_time_range']:'')));
+			WHERE '.(!empty($_where_clause)?$_where_clause:'1=1').' '.($_use_filters?self::$sql_filters['where']:'').' '.($_use_date_filters?self::$sql_filters['where_time_range']:''),
+			'SUM(counthits) AS counthits'));
 	}
 
 	public static function count_outbound(){
-		return intval(wp_slimstat::$wpdb->get_var("
+		return intval(self::get_var("
 			SELECT COUNT(outbound_id) counthits
 			FROM {$GLOBALS['wpdb']->prefix}slim_stats t1 INNER JOIN {$GLOBALS['wpdb']->prefix}slim_outbound tob ON t1.id = tob.id ".self::$sql_filters['from']['all_other_tables']."
-			WHERE 1=1 ".self::$sql_filters['where'].' '.self::$sql_filters['where_time_range']));
+			WHERE 1=1 ".self::$sql_filters['where'].' '.self::$sql_filters['where_time_range'],
+			'SUM(counthits) AS counthits'));
 	}
 
 	public static function count_records_having($_where_clause = '1=1', $_column = 't1.ip', $_having_clause = ''){
-		return intval(wp_slimstat::$wpdb->get_var("
-			SELECT COUNT(*) FROM (
+		return intval(self::get_var("
+			SELECT COUNT(*) counthits FROM (
 				SELECT $_column
 				FROM ".self::$sql_filters['from']['all_tables'].' '.self::_add_filters_to_sql_from($_where_clause)."
 				WHERE $_where_clause ".self::$sql_filters['where'].' '.self::$sql_filters['where_time_range']."
 				GROUP BY $_column
 				".(!empty($_having_clause)?"HAVING $_having_clause":'').')
-			AS ts1'));
+			AS ts1',
+			'SUM(counthits) AS counthits'));
 	}
 
 	public static function get_data_size(){
@@ -394,22 +399,27 @@ class wp_slimstat_db {
 	}
 
 	public static function get_max_and_average_pages_per_visit(){
-		return wp_slimstat::$wpdb->get_row('
-			SELECT AVG(ts1.counthits) avg, MAX(ts1.counthits) max FROM (
+		return self::get_results('
+			SELECT AVG(ts1.counthits) AS avghits, MAX(ts1.counthits) AS maxhits FROM (
 				SELECT count(ip) counthits, visit_id
 				FROM '.self::$sql_filters['from']['all_tables'].'
 				WHERE visit_id > 0 '.self::$sql_filters['where'].' '.self::$sql_filters['where_time_range'].'
 				GROUP BY visit_id
-			) AS ts1', ARRAY_A);
+			) AS ts1',
+			'blog_id',
+			'',
+			'',
+			'AVG(avghits) AS avghits, MAX(maxhits) AS maxhits');
 	}
 
 	public static function get_oldest_visit($_where_clause = '1=1', $_use_filters = true){
-		return wp_slimstat::$wpdb->get_var("
+		return self::get_var("
 			SELECT t1.dt
 			FROM {$GLOBALS['wpdb']->prefix}slim_stats t1 ".($_use_filters?self::$sql_filters['from']['all_other_tables']:'').' '.self::_add_filters_to_sql_from($_where_clause).'
 			WHERE '.(!empty($_where_clause)?$_where_clause:'1=1').' '.($_use_filters?self::$sql_filters['where']:'').'
 			ORDER BY dt ASC
-			LIMIT 0,1');
+			LIMIT 0,1',
+			'MIN(dt)');
 	}
 
 	public static function get_popular($_column = 't1.id', $_custom_where = '', $_more_columns = '', $_having_clause = '', $_as_column = ''){
@@ -420,9 +430,9 @@ class wp_slimstat_db {
 			GROUP BY $_column $_more_columns $_having_clause
 			ORDER BY counthits ".self::$filters_normalized['misc']['direction']."
 			LIMIT ".self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results'], 
-			(!empty($_as_column)?$_as_column:$_column).' '.$_more_columns,
+			(!empty($_as_column)?$_as_column:$_column).' '.$_more_columns.', blog_id',
 			'counthits '.self::$filters_normalized['misc']['direction'],
-			"$_column $_more_columns $_having_clause",
+			"$_column $_more_columns",
 			'SUM(counthits) AS counthits');
 	}
 
@@ -434,7 +444,7 @@ class wp_slimstat_db {
 			GROUP BY tob.outbound_resource 
 			ORDER BY counthits '.self::$filters_normalized['misc']['direction'].'
 			LIMIT '.self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results'],
-			'resource',
+			'blog_id, resource',
 			'counthits '.self::$filters_normalized['misc']['direction'],
 			'outbound_resource',
 			'SUM(counthits) AS counthits');
@@ -495,7 +505,7 @@ class wp_slimstat_db {
 			WHERE '.(($_type != -1)?"tob.type = $_type":'tob.type > 1').' '.self::$sql_filters['where'].' '.self::$sql_filters['where_time_range'].'
 			ORDER BY tob.dt '.self::$filters_normalized['misc']['direction'].'
 			LIMIT '.self::$filters_normalized['misc']['start_from'].', '.self::$filters_normalized['misc']['limit_results'],
-			'visit_id, outbound_domain, resource, type, notes, ip, other_ip, user, domain, referer, country, browser, platform, dt',
+			'blog_id, visit_id, outbound_domain, resource, type, notes, ip, other_ip, user, domain, referer, country, browser, platform, dt',
 			'dt '.self::$filters_normalized['misc']['direction']);
 	}
 
@@ -560,7 +570,7 @@ class wp_slimstat_db {
 		$sql .= " GROUP BY $group_by_string";
 
 		// Get the data
-		$results = self::get_results($sql, 'datestamp', '', $group_by_string, 'SUM(first_metric) AS first_metric, SUM(second_metric) AS second_metric');
+		$results = self::get_results($sql, 'blog_id, datestamp', '', $group_by_string, 'SUM(first_metric) AS first_metric, SUM(second_metric) AS second_metric');
 
 		// Fill the output array
 		$output['current']['label'] = '';
@@ -695,6 +705,12 @@ class wp_slimstat_db {
 		}
 
 		return wp_slimstat::$wpdb->get_results($_sql, ARRAY_A);
+	}
+	
+	public static function get_var($_sql = '', $_aggregate_value = ''){
+		$_sql = apply_filters('slimstat_get_var_sql', $_sql, $_aggregate_value);
+		
+		return wp_slimstat::$wpdb->get_var($_sql);
 	}
 
 /*
