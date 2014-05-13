@@ -7,7 +7,7 @@ class wp_slimstat_admin{
 	public static $current_tab = 1;
 	public static $faulty_fields = array();
 	
-	protected static $admin_notice = "We are honored to see that WP SlimStat is being pirated and sold at $90 a pop as Keyword Swarm. It means that our product is not <a href='http://wordpress.org/support/topic/overrated-1' target='_blank'>as bad as someone claims it to be</a>. But please save your money and keep using the original free product you've been enjoying <a href='http://www.bloggingpro.com/archives/2006/05/23/slimstat-and-wp-slimstat/' target='_blank'>for 8 years now</a>. And if your know people who have purchased the knock off, tell them to go get their refund!";
+	protected static $admin_notice = "Network-wide reports? <a href='http://slimstat.getused.to.it/addons/network-view/' target='_blank'>YES, please!</a> You asked for it, you got it. We're now working on network-wide settings, stay tuned!";
 	
 	/**
 	 * Init -- Sets things up.
@@ -51,9 +51,9 @@ class wp_slimstat_admin{
 		add_filter('screen_settings', array(__CLASS__, 'screen_settings'), 10, 2);
 
 		// Display a notice that hightlights this version's features
-		//if (!empty($_GET['page']) && strpos($_GET['page'], 'wp-slim') !== false && !empty(self::$admin_notice) && wp_slimstat::$options['show_admin_notice'] != wp_slimstat::$version) {
-		//	add_action('admin_notices', array(__CLASS__, 'show_admin_notice'));
-		//}
+		if (!empty($_GET['page']) && strpos($_GET['page'], 'wp-slim') !== false && !empty(self::$admin_notice) && wp_slimstat::$options['show_admin_notice'] != wp_slimstat::$version) {
+			add_action('admin_notices', array(__CLASS__, 'show_admin_notice'));
+		}
 
 		// Remove spammers from the database
 		if (wp_slimstat::$options['ignore_spammers'] == 'yes'){
@@ -407,7 +407,8 @@ class wp_slimstat_admin{
 			'current_tab' => self::$current_tab,
 			'expand_details' => isset(wp_slimstat::$options['expand_details'])?wp_slimstat::$options['expand_details']:'no',
 			'refresh_interval' => (self::$current_tab == 1)?intval(wp_slimstat::$options['refresh_interval']):0,
-			'text_direction' => $GLOBALS['wp_locale']->text_direction
+			'text_direction' => $GLOBALS['wp_locale']->text_direction,
+			'use_slimscroll' => isset(wp_slimstat::$options['use_slimscroll'])?wp_slimstat::$options['use_slimscroll']:'yes'
 		);
 		wp_localize_script('slimstat_admin', 'SlimStatAdminParams', $params);
 	}
@@ -691,6 +692,9 @@ class wp_slimstat_admin{
 			case 'section_header': ?>
 				<td colspan="2" class="slimstat-options-section-header"><?php echo $_option_details['description'] ?></td><?php
 				break;
+			case 'static': ?>
+				<td colspan="2"><?php echo $_option_details['description'] ?> <textarea rows="7" class="large-text code" disabled><?php echo $_option_details['long_description'] ?></textarea></td><?php
+				break;
 			case 'yesno': ?>
 				<th scope="row"><label for="<?php echo $_option_name ?>"><?php echo $_option_details['description'] ?></label></th>
 				<td>
@@ -713,6 +717,8 @@ class wp_slimstat_admin{
 	}
 
 	protected static function settings_textarea($_option_name = '', $_option_details = array('description' =>'', 'type' => '', 'long_description' => ''), $_alternate = false){
+		$_option_details = array_merge(array('description' =>'', 'type' => '', 'long_description' => '', 'before_input_field' => '', 'after_input_field' => '', 'custom_label_yes' => '', 'custom_label_no' => ''), $_option_details);
+		
 		if (!isset(wp_slimstat::$options[$_option_name])){
 			wp_slimstat::$options[$_option_name] = '';
 		} ?>
@@ -721,7 +727,7 @@ class wp_slimstat_admin{
 			<td colspan="2">
 				<label for="<?php echo $_option_name ?>"><?php echo $_option_details['description'] ?></label>
 				<p class="description"><?php echo $_option_details['long_description'] ?></p>
-				<p><textarea class="large-text code" cols="50" rows="3" name="options[<?php echo $_option_name ?>]" id="<?php echo $_option_name ?>"><?php echo !empty(wp_slimstat::$options[$_option_name])?stripslashes(wp_slimstat::$options[$_option_name]):'' ?></textarea></p>
+				<p><textarea class="large-text code" cols="50" rows="3" name="options[<?php echo $_option_name ?>]" id="<?php echo $_option_name ?>"><?php echo !empty(wp_slimstat::$options[$_option_name])?stripslashes(wp_slimstat::$options[$_option_name]):'' ?></textarea> <span class="description"><?php echo $_option_details['after_input_field'] ?></span></p>
 			</td>
 		</tr><?php
 	}
