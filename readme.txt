@@ -4,7 +4,7 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: analytics, tracking, reports, analyze, wassup, geolocation, online users, spider, tracker, pageviews, stats, maxmind, statistics, statpress
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 3.6.8
+Stable tag: 3.6.9
 
 == Description ==
 Visit our [website](http://slimstat.getused.to.it/) for more information, or find us on [GitHub](https://github.com/getusedtoit/wp-slimstat) (psst, we have Flattr enabled, there: star our project to donate).
@@ -270,6 +270,10 @@ foreach ($results...`
 5. **Responsive layout** - Keep an eye on your reports on the go
 
 == Changelog ==
+
+= 3.6.9 =
+* [Note] Plugin was "unofficially" renamed Slimstat (dropped WP) to match new branding
+* [Note] Our new website is finally live, [check it out](http://slimstat.getused.to.it/)
 
 = 3.6.8 =
 * [Fix] Mobile Safari on iOS was not being properly detected
