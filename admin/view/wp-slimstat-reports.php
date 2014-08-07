@@ -34,7 +34,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 
 		self::$all_reports_titles = array(
 			'slim_p1_01' => __('Pageviews (chart)','wp-slimstat'),
-			'slim_p1_02' => __('About WP SlimStat','wp-slimstat'),
+			'slim_p1_02' => __('About Slimstat','wp-slimstat'),
 			'slim_p1_03' => __('At a Glance','wp-slimstat'),
 			'slim_p1_04' => __('Currently Online','wp-slimstat'),
 			'slim_p1_05' => __('Spy View','wp-slimstat'),
@@ -740,7 +740,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 		$count_non_zero = count(array_filter($_chart_data['current']['first_metric']));
 		?>
 
-		<p><?php self::inline_help(__('A request to load a single HTML file. WP SlimStat logs a "pageview" each time the tracking code is executed.','wp-slimstat'));
+		<p><?php self::inline_help(__('A request to load a single HTML file. Slimstat logs a "pageview" each time the tracking code is executed.','wp-slimstat'));
 			_e('Pageviews', 'wp-slimstat'); ?> <span><?php echo number_format($_current_pageviews, 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php self::inline_help(__('How many pages have been visited on average during the current period.','wp-slimstat'));
 			_e('Average Pageviews', 'wp-slimstat') ?> <span><?php echo number_format(($count_non_zero > 0)?intval($_current_pageviews/$count_non_zero):0, 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
@@ -842,7 +842,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 		$new_visitors = wp_slimstat_db::count_records_having('visit_id > 0', 'ip', 'COUNT(visit_id) = 1');
 		$new_visitors_rate = ($total_human_hits > 0)?sprintf("%01.2f", (100*$new_visitors/$total_human_hits)):0;
 		if (intval($new_visitors_rate) > 99) $new_visitors_rate = '100'; ?>		
-		<p><?php self::inline_help(__('A request to load a single HTML file. WP SlimStat logs a "pageview" each time the tracking code is executed.','wp-slimstat')) ?>
+		<p><?php self::inline_help(__('A request to load a single HTML file. Slimstat logs a "pageview" each time the tracking code is executed.','wp-slimstat')) ?>
 			<?php _e('Pageviews', 'wp-slimstat') ?> <span><?php echo number_format($_current_pageviews, 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php self::inline_help(__('A referrer (or referring site) is the site that a visitor previously visited before following a link to your site.','wp-slimstat')) ?>
 			<?php _e('Unique Referrers', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records("t1.domain <> '{$_SERVER['SERVER_NAME']}' AND t1.domain <> ''", 't1.domain'), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
