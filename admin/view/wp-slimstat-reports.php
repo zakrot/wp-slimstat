@@ -23,12 +23,12 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 	 */
 	public static function init(){
 		self::$screen_names = array(
-			1 => __('Activity Log','wp-slimstat'),
+			1 => __('Real-Time Log','wp-slimstat'),
 			2 => __('Overview','wp-slimstat'),
-			3 => __('Visitors','wp-slimstat'),
-			4 => __('Content','wp-slimstat'),
+			3 => __('Audience','wp-slimstat'),
+			4 => __('Site Analysis','wp-slimstat'),
 			5 => __('Traffic Sources','wp-slimstat'),
-			6 => __('World Map','wp-slimstat'),
+			6 => __('Map Overlay','wp-slimstat'),
 			7 => __('Custom Reports','wp-slimstat')
 		);
 
@@ -94,7 +94,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 			'slim_p4_18' => __('Top Authors','wp-slimstat'),
 			'slim_p4_19' => __('Top Tags','wp-slimstat'),
 			'slim_p4_20' => __('Recent Downloads','wp-slimstat'),
-			'slim_p4_21' => __('Top Outbound Links and Downloads','wp-slimstat'),
+			'slim_p4_21' => __('Top OutLinks and Downloads','wp-slimstat'),
 			'slim_p4_22' => __('Your Website','wp-slimstat'),
 			'slim_p6_01' => __('World Map','wp-slimstat'),
 			'slim_p7_02' => __('At A Glance','wp-slimstat')

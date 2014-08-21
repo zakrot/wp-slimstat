@@ -3,7 +3,7 @@
 Plugin Name: WP Slimstat
 Plugin URI: http://wordpress.org/plugins/wp-slimstat/
 Description: The leading web analytics plugin for WordPress
-Version: 3.6.9
+Version: 3.7
 Author: Camu
 Author URI: http://slimstat.getused.to.it/
 */
@@ -11,9 +11,9 @@ Author URI: http://slimstat.getused.to.it/
 if (!empty(wp_slimstat::$options)) return true;
 
 class wp_slimstat{
-	public static $version = '3.6.9';
+	public static $version = '3.7';
 	public static $options = array();
-	
+
 	public static $wpdb = '';
 
 	protected static $data_js = array('id' => -1);
@@ -194,7 +194,6 @@ class wp_slimstat{
 	 * Core tracking functionality
 	 */
 	public static function slimtrack($_argument = ''){
-		// Don't track 
 		self::$stat['dt'] = date_i18n('U');
 		self::$stat['notes'] = '';
 
@@ -738,7 +737,7 @@ class wp_slimstat{
 				$browser['browser'] = $search[5];
 				$browser['version'] = intval($search[6]);
 				$browser['platform'] = strtolower($search[9]);
-				$browser['css_version'] = $search[28];
+				$browser['css_version'] = $search[29];
 				$browser['user_agent'] =  $search[0];
 
 				// browser Types:
@@ -746,9 +745,9 @@ class wp_slimstat{
 				//		1: crawler
 				//		2: mobile
 				//		3: syndication reader
-				if ($search[25] == 'true') $browser['type'] = 2;
-				elseif ($search[26] == 'true') $browser['type'] = 3;
-				elseif ($search[27] != 'true') $browser['type'] = 0;
+				if ($search[25] == 'true' || $search[26] == 'true') $browser['type'] = 2;
+				elseif ($search[27] == 'true') $browser['type'] = 3;
+				elseif ($search[28] != 'true') $browser['type'] = 0;
 
 				if ($browser['version'] != 0 || $browser['type'] != 0){
 					return $browser;
