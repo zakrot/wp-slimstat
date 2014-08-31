@@ -14,7 +14,7 @@ Visit our [website](http://slimstat.getused.to.it/) for more information, or fin
 * Integrates with WooCommerce and other e-commerce plugins
 * Compatible with W3 Total Cache, WP SuperCache and HyperCache
 * The most accurate IP geolocation, browser and platform detection ever seen (courtesy of [MaxMind](http://www.maxmind.com/) and [Browscap](http://browscap.org))
-* Available in multiple languages: English, Chinese (沐熙工作室), Farsi ([Dean](http://www.mangallery.net)), French (Michael Bastin, Jean-Michel Venet, Yves Pouplard), German (TechnoViel), Italian, Portuguese, Russian ([Vitaly](http://www.visbiz.org/)), Spanish ([WebHostingHub](http://www.webhostinghub.com/)), Swedish (Per Soderman). Is your language is missing or incomplete? [Contact Us](http://support.getused.to.it/) if you would like to share your localization.
+* Available in multiple languages: English, Chinese (沐熙工作室), Farsi ([Dean](http://www.mangallery.net)), French (Michael Bastin, Jean-Michel Venet, Yves Pouplard), German (TechnoViel), Italian, Japanese (h_a_l_f), Portuguese, Russian ([Vitaly](http://www.visbiz.org/)), Spanish ([WebHostingHub](http://www.webhostinghub.com/)), Swedish (Per Soderman). Is your language is missing or incomplete? [Contact Us](http://support.getused.to.it/) if you would like to share your localization.
 * World Map that works on your mobile device, too (courtesy of [amMap](http://www.ammap.com/)).
 
 = What are people saying about Slimstat? =
@@ -272,7 +272,11 @@ foreach ($results...`
 == Changelog ==
 
 = 3.7 =
+* [New] Japanese localization added (thank you, [h_a_l_f](http://wordpress.org/support/topic/japanese-localization))
+* [New] Added support for [SOV Languages](http://en.wikipedia.org/wiki/Subject%E2%80%93object%E2%80%93verb) (thank you, h_a_l_f)
+* [New] Added support for our Network Settings premium add-on
 * [Update] All the icons used in the admin are now optimized (thank you, [scruffy1](http://wordpress.org/support/topic/suggestion-79))
+* [Fix] Introduced some code optimizations (browser detection) that will solve the slow response time once and for all!
 
 = 3.6.9 =
 * [Note] Our new website is finally live, [check it out](http://slimstat.getused.to.it/)
