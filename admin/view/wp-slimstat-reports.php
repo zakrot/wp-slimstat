@@ -47,7 +47,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 			'slim_p1_15' => __('Rankings','wp-slimstat'),
 			'slim_p1_17' => __('Top Language Families','wp-slimstat'),
 			'slim_p2_01' => __('Human Visits (chart)','wp-slimstat'),
-			'slim_p2_02' => __('At a Glance','wp-slimstat'),
+			'slim_p2_02' => __('Audience Overview','wp-slimstat'),
 			'slim_p2_03' => __('Top Languages','wp-slimstat'),
 			'slim_p2_04' => __('Top Browsers','wp-slimstat'),
 			'slim_p2_05' => __('Top Service Providers','wp-slimstat'),
@@ -97,7 +97,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 			'slim_p4_21' => __('Top OutLinks and Downloads','wp-slimstat'),
 			'slim_p4_22' => __('Your Website','wp-slimstat'),
 			'slim_p6_01' => __('World Map','wp-slimstat'),
-			'slim_p7_02' => __('At A Glance','wp-slimstat')
+			'slim_p7_02' => __('Activity','wp-slimstat')
 		);
 
 		// TO BE REVIEWED AND CLEANED UP
@@ -489,7 +489,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 				$row_details = date_i18n(wp_slimstat_db::$formats['date_time_format'], $results[$i]['dt'], true).$row_details;
 			}
 			else{
-				$percentage = '<span>'.(($_args['total_for_percentage'] > 0)?number_format(sprintf("%01.2f", (100*$results[$i]['counthits']/$_args['total_for_percentage'])), 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']):0).'%</span>';
+				$percentage = ' <span>'.(($_args['total_for_percentage'] > 0)?number_format(sprintf("%01.2f", (100*$results[$i]['counthits']/$_args['total_for_percentage'])), 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']):0).'%</span>';
 				$row_details = __('Hits','wp-slimstat').': '.number_format($results[$i]['counthits'], 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']).$row_details;
 			}
 
@@ -1046,7 +1046,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 		<p><?php _e('Avg Posts Per Day', 'wp-slimstat') ?> <span><?php echo number_format($your_content['avg_posts_per_day'], 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p><?php
 	}
 
-	public static function show_report_wrapper($_report_id = 'p0'){
+	public static function show_report_wrapper($_report_id = 'p0', $_force_return = false){
 		$is_ajax = false;
 		if (!empty($_POST['report_id'])){
 			// Let's make sure the request is coming from the right place
@@ -1055,7 +1055,7 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 			$is_ajax = true;
 		}
 
-		if (!$is_ajax && (in_array($_report_id, self::$hidden_reports) || wp_slimstat::$options['async_load'] == 'yes')) return; 
+		if (!$_force_return && !$is_ajax && (in_array($_report_id, self::$hidden_reports) || wp_slimstat::$options['async_load'] == 'yes')) return; 
 
 		// Some boxes need extra information
 		if (in_array($_report_id, array('slim_p1_03', 'slim_p1_08', 'slim_p1_10', 'slim_p1_13', 'slim_p1_17', 'slim_p2_03', 'slim_p2_04', 'slim_p2_05', 'slim_p2_06', 'slim_p2_18', 'slim_p2_19', 'slim_p2_10', 'slim_p3_02', 'slim_p3_04', 'slim_p3_05'))){

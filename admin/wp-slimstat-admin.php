@@ -19,7 +19,7 @@ class wp_slimstat_admin{
 		}
 
 		if (wp_slimstat::$options['enable_ads_network'] == 'yes' || wp_slimstat::$options['enable_ads_network'] == 'no') {
-			self::$admin_notice = "Network-wide settings are finally here. You can now use the same options for all the instances in your multisite environment. <a href='http://slimstat.getused.to.it/addons/' target='_blank'>Check it out</a>.";
+			self::$admin_notice = "We are putting the final touches on a new premium add-on to schedule email reports. If you would like to help us test it, please <a href='http://support.getused.to.it/' target='_blank'>contact us</a> to get your FREE copy! Hurry, this offer is limited to the first 20 users.";
 		}
 		else {
 			self::$admin_notice = "
@@ -681,8 +681,7 @@ class wp_slimstat_admin{
 	 */
 	public static function enable_ads_feature(){
 		wp_slimstat::$options['enable_ads_network'] = 'yes';
-		wp_slimstat::$options['show_admin_notice'] = wp_slimstat::$version;
-		die();
+		self::hide_admin_notice();
 	}
 	
 	/*
@@ -759,6 +758,21 @@ class wp_slimstat_admin{
 					<span class="description"><?php echo $_option_details['long_description'] ?></span>
 				</td><?php
 				break;
+			case 'select': ?>
+				<th scope="row"><label for="<?php echo $_option_name ?>"><?php echo $_option_details['description'] ?></label></th>
+				<td>
+					<span class="block-element">
+						<select <?php echo $is_disabled ?> name="options[<?php echo $_option_name ?>]" id="<?php echo $_option_name ?>"><?php
+							foreach($_option_details['values'] as $a_key => $a_value){
+								$is_selected = (wp_slimstat::$options[$_option_name] == $a_key)?' selected':'';
+								echo "<option$is_selected value='$a_key'>$a_value</option>";
+							}
+						?></select>
+					</span>
+					<span class="description"><?php echo $_option_details['long_description'] ?></span>
+				</td><?php
+				break;
+				
 			case 'text':
 			case 'integer': ?>
 				<th scope="row"><label for="<?php echo $_option_name ?>"><?php echo $_option_details['description'] ?></label></th>

@@ -3,7 +3,7 @@
 Plugin Name: WP Slimstat
 Plugin URI: http://wordpress.org/plugins/wp-slimstat/
 Description: The leading web analytics plugin for WordPress
-Version: 3.7
+Version: 3.7.1
 Author: Camu
 Author URI: http://slimstat.getused.to.it/
 */
@@ -11,7 +11,7 @@ Author URI: http://slimstat.getused.to.it/
 if (!empty(wp_slimstat::$options)) return true;
 
 class wp_slimstat{
-	public static $version = '3.7';
+	public static $version = '3.7.1';
 	public static $options = array();
 
 	public static $wpdb = '';
@@ -1293,18 +1293,18 @@ class wp_slimstat{
 				$slimstat_view_url = $slimstat_config_url = 'options.php';
 			}
 
-			$slimstat_view_url = get_site_url($GLOBALS['blog_id'], "/wp-admin/$slimstat_view_url?page=wp-slim-view-");
+			$slimstat_view_url = get_site_url($GLOBALS['blog_id'], "/wp-admin/$slimstat_view_url?page=");
 			$slimstat_config_url = get_site_url($GLOBALS['blog_id'], "/wp-admin/$slimstat_config_url?page=wp-slim-config");
 			
 			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-header', 'title' => 'Slimstat', 'href' => "{$slimstat_view_url}1"));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel1', 'href' => "{$slimstat_view_url}1", 'parent' => 'slimstat-header', 'title' => __('Activity Log', 'wp-slimstat')));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel2', 'href' => "{$slimstat_view_url}2", 'parent' => 'slimstat-header', 'title' => __('Overview', 'wp-slimstat')));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel3', 'href' => "{$slimstat_view_url}3", 'parent' => 'slimstat-header', 'title' => __('Visitors', 'wp-slimstat')));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel4', 'href' => "{$slimstat_view_url}4", 'parent' => 'slimstat-header', 'title' => __('Content', 'wp-slimstat')));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel5', 'href' => "{$slimstat_view_url}5", 'parent' => 'slimstat-header', 'title' => __('Traffic Sources', 'wp-slimstat')));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel6', 'href' => "{$slimstat_view_url}6", 'parent' => 'slimstat-header', 'title' => __('World Map', 'wp-slimstat')));
-			if (has_action('wp_slimstat_custom_report')) $GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel7', 'href' => "{$slimstat_view_url}7", 'parent' => 'slimstat-header', 'title' => __('Custom Reports', 'wp-slimstat')));
-			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel8', 'href' => "{$slimstat_view_url}addons", 'parent' => 'slimstat-header', 'title' => __('Add-ons', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel1', 'href' => "{$slimstat_view_url}wp-slim-view-1", 'parent' => 'slimstat-header', 'title' => __('Activity Log', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel2', 'href' => "{$slimstat_view_url}wp-slim-view-2", 'parent' => 'slimstat-header', 'title' => __('Overview', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel3', 'href' => "{$slimstat_view_url}wp-slim-view-3", 'parent' => 'slimstat-header', 'title' => __('Visitors', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel4', 'href' => "{$slimstat_view_url}wp-slim-view-4", 'parent' => 'slimstat-header', 'title' => __('Content', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel5', 'href' => "{$slimstat_view_url}wp-slim-view-5", 'parent' => 'slimstat-header', 'title' => __('Traffic Sources', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel6', 'href' => "{$slimstat_view_url}wp-slim-view-6", 'parent' => 'slimstat-header', 'title' => __('World Map', 'wp-slimstat')));
+			if (has_action('wp_slimstat_custom_report')) $GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel7', 'href' => "{$slimstat_view_url}wp-slim-view-7", 'parent' => 'slimstat-header', 'title' => __('Custom Reports', 'wp-slimstat')));
+			$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-panel8', 'href' => "{$slimstat_view_url}wp-slim-addons", 'parent' => 'slimstat-header', 'title' => __('Add-ons', 'wp-slimstat')));
 			
 			if ((empty(wp_slimstat::$options['can_admin']) || strpos(wp_slimstat::$options['can_admin'], $GLOBALS['current_user']->user_login) !== false || $GLOBALS['current_user']->user_login == 'slimstatadmin') && current_user_can('edit_posts')){
 				$GLOBALS['wp_admin_bar']->add_menu(array('id' => 'slimstat-config', 'href' => $slimstat_config_url, 'parent' => 'slimstat-header', 'title' => __('Settings', 'wp-slimstat')));
