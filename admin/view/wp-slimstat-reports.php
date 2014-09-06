@@ -1,6 +1,6 @@
 <?php
 
-class wp_slimstat_reports extends wp_slimstat_admin{
+class wp_slimstat_reports {
 	// Hidden filters are not displayed to the user, but are applied to the reports
 	public static $hidden_filters = array('hour' => 1, 'day' => 1, 'month' => 1, 'year' => 1, 'interval' => 1, 'direction' => 1, 'limit_results' => 1, 'start_from' => 1);
 
@@ -17,11 +17,20 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 	
 	// Shared descriptions
 	public static $chart_tooltip = '';
+	
+	// Private variables
+	protected static $current_tab = 1;
+	protected static $view_url = '';
 
 	/**
 	 * Initalizes class properties
 	 */
-	public static function init(){
+	public static function init($_args = array()){
+		// Args
+		if (!empty($_args['current_tab'])){
+			self::$current_tab = $_args['current_tab'];
+		}
+
 		self::$screen_names = array(
 			1 => __('Real-Time Log','wp-slimstat'),
 			2 => __('Overview','wp-slimstat'),
@@ -99,6 +108,8 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 			'slim_p6_01' => __('World Map','wp-slimstat'),
 			'slim_p7_02' => __('Activity','wp-slimstat')
 		);
+
+		self::$view_url = ((wp_slimstat::$options['use_separate_menu'] == 'no')?'options.php':'admin.php').'?page=wp-slim-view-'.self::$current_tab;
 
 		// TO BE REVIEWED AND CLEANED UP
 		self::$meta_report_order_nonce = wp_create_nonce('meta-box-order');
@@ -277,6 +288,43 @@ class wp_slimstat_reports extends wp_slimstat_admin{
 
 	public static function report_footer(){
 		echo '</div></div>';
+	}
+
+	public static function fs_url($_filters = '', $_view_url = ''){
+		$filtered_url = !empty($_view_url)?$_view_url:self::$view_url;
+
+		// Backward compatibility
+		if (is_array($_filters)){
+			$flat_filters = array();
+			foreach($_filters as $a_key => $a_filter_data){
+				$flat_filters[] = "$a_key $a_filter_data";
+			}
+			$_filters = implode('&&&', $flat_filters);
+		}
+
+		// Columns
+		$filters_normalized = wp_slimstat_db::parse_filters($_filters, false);
+		if (!empty($filters_normalized['columns'])){
+			foreach($filters_normalized['columns'] as $a_key => $a_filter){
+				$filtered_url .= "&amp;fs%5B$a_key%5D=".urlencode($a_filter[0].' '.$a_filter[1]);
+			}
+		}
+
+		// Date ranges
+		if (!empty($filters_normalized['date'])){
+			foreach($filters_normalized['date'] as $a_key => $a_filter){
+				$filtered_url .= "&amp;fs%5B$a_key%5D=".urlencode('equals '.$a_filter);
+			}
+		}
+
+		// Misc filters
+		if (!empty($filters_normalized['misc'])){
+			foreach($filters_normalized['misc'] as $a_key => $a_filter){
+				$filtered_url .= "&amp;fs%5B$a_key%5D=".urlencode('equals '.$a_filter);
+			}
+		}
+
+		return $filtered_url;
 	}
 
 	public static function report_pagination($_id = 'p0', $_count_page_results = 0, $_count_all_results = 0){

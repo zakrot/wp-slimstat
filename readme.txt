@@ -272,7 +272,10 @@ foreach ($results...`
 == Changelog ==
 
 = 3.7.1 =
+* [Note] Our Reports API (wp-slimstat-reports.php) does not extend wp-slimstat-admin anymore, for extra flexibility in building third-party solutions
 * [New] Added support for generating email reports
+* [Update] MaxMind's IP Database has been updated to the latest version (2014-09-04)
+* [Fix] Some settings could not be turned off, because of the Network Settings functionality (thank you, [LeonardShelby](http://wordpress.org/support/topic/cannot-disable-live-stream))
 
 = 3.7 =
 * [New] Japanese localization added (thank you, [h_a_l_f](http://wordpress.org/support/topic/japanese-localization))
