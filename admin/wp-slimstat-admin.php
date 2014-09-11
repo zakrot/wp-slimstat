@@ -17,7 +17,8 @@ class wp_slimstat_admin{
 		}
 
 		if (wp_slimstat::$options['enable_ads_network'] == 'yes' || wp_slimstat::$options['enable_ads_network'] == 'no') {
-			self::$admin_notice = "We are putting the final touches on a new premium add-on to schedule email reports. If you would like to help us test it, please <a href='http://support.getused.to.it/' target='_blank'>contact us</a> to get your FREE copy! Hurry, this offer is limited to the first 10 users.";
+			// self::$admin_notice = "We are putting the final touches on a new premium add-on to schedule email reports. If you would like to help us test it, please <a href='http://support.getused.to.it/' target='_blank'>contact us</a> to get your FREE copy today! Hurry, this offer is limited to the first 10 users.";
+			self::$admin_notice = "Do you sell tickets online? <a href='http://wordpress.org/plugins/opentickets-community-edition/' target='_blank'>OpenTickets Community Edition</a> is a free WordPress plugin I contribute to.  Get your FREE copy today!";
 		}
 		else {
 			self::$admin_notice = "
@@ -582,8 +583,9 @@ class wp_slimstat_admin{
 	public static function add_post_column($_column_name, $_post_id){
 		if ('wp-slimstat' != $_column_name) return;
 
-		include_once(dirname(__FILE__).'/view/wp-slimstat-db.php');
-
+		include_once(dirname(__FILE__).'/view/wp-slimstat-reports.php');
+		wp_slimstat_reports::init();
+		
 		$parsed_permalink = parse_url( get_permalink($_post_id) );
 		$parsed_permalink = $parsed_permalink['path'].(!empty($parsed_permalink['query'])?'?'.$parsed_permalink['query']:'');
 		wp_slimstat_db::init('resource contains '.$parsed_permalink.'&&&hour equals 0&&&day equals '.date_i18n('d').'&&&month equals '.date_i18n('m').'&&&year equals '.date_i18n('Y').'&&&interval equals -365');
