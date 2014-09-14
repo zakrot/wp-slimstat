@@ -4,14 +4,14 @@ Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_i
 Tags: analytics, tracking, reports, analyze, wassup, geolocation, online users, spider, tracker, pageviews, stats, maxmind, statistics, statpress
 Requires at least: 3.8
 Tested up to: 4.0
-Stable tag: 3.7.2
+Stable tag: 3.7.3
 
 == Description ==
 Visit our [website](http://slimstat.getused.to.it/) for more information, or find us on [GitHub](https://github.com/getusedtoit/wp-slimstat).
 
 = Key Features =
 * Real-time activity log
-* Integrates with WooCommerce and other e-commerce plugins
+* The first and only to provide information about page speed and server latency
 * Compatible with W3 Total Cache, WP SuperCache and HyperCache
 * The most accurate IP geolocation, browser and platform detection ever seen (courtesy of [MaxMind](http://www.maxmind.com/) and [Browscap](http://browscap.org))
 * Available in multiple languages: English, Chinese (沐熙工作室), Farsi ([Dean](http://www.mangallery.net)), French (Michael Bastin, Jean-Michel Venet, Yves Pouplard), German (TechnoViel), Italian, Japanese (h_a_l_f), Portuguese, Russian ([Vitaly](http://www.visbiz.org/)), Spanish ([WebHostingHub](http://www.webhostinghub.com/)), Swedish (Per Soderman). Is your language missing or incomplete? [Contact Us](http://support.getused.to.it/) if you would like to share your localization.
@@ -270,6 +270,12 @@ foreach ($results...`
 5. **Responsive layout** - Keep an eye on your reports on the go
 
 == Changelog ==
+
+= 3.7.3 =
+* [New] Slimstat now tracks server latency and page performance. Please be patient the first time you load the reports: the database is being upgraded to store this new info!
+* [New] Date and time formatting is now independent from the one used by WordPress
+* [Update] Autopurge is now disabled by default on new installs, since people have had issues with losing old data by mistake
+* [Update] Russian Localization (thank you, [Vitaly](http://tiny.cc/iHerbSpecials))
 
 = 3.7.2 =
 * [New] Added operator BETWEEN, to express filters like "country code BETWEEN f,g" and get reports for France and Ghana but not for Portugal. Or something like "screen resolution BETWEEN 1000,1300" to get data for visitors whose screen *width* is at least 1000 px and no more than 1300 px. Separate the two values in the range with a comma.

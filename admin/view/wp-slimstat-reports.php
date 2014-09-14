@@ -17,10 +17,9 @@ class wp_slimstat_reports {
 	
 	// Shared descriptions
 	public static $chart_tooltip = '';
-	
-	// Private variables
-	protected static $current_tab = 1;
-	protected static $view_url = '';
+
+	public static $current_tab = 1;
+	public static $view_url = '';
 
 	/**
 	 * Initalizes class properties
@@ -534,7 +533,7 @@ class wp_slimstat_reports {
 			$element_value = "<a class='slimstat-filter-link' href='".self::fs_url($_column.' '.$_args['filter_op'].' '.$results[$i][$_column])."'>$element_value</a>";
 
 			if ($_type == 'recent'){
-				$row_details = date_i18n(wp_slimstat_db::$formats['date_time_format'], $results[$i]['dt'], true).$row_details;
+				$row_details = date_i18n(wp_slimstat::$options['date_time_format'], $results[$i]['dt'], true).$row_details;
 			}
 			else{
 				$percentage = ' <span>'.(($_args['total_for_percentage'] > 0)?number_format(sprintf("%01.2f", (100*$results[$i]['counthits']/$_args['total_for_percentage'])), 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']):0).'%</span>';
@@ -710,7 +709,7 @@ class wp_slimstat_reports {
 				$host_by_ip .= ($host_by_ip != $results[$i]['ip'])?" ({$results[$i]['ip']})":'';
 			}
 
-			$results[$i]['dt'] = date_i18n(wp_slimstat_db::$formats['date_time_format'], $results[$i]['dt'], true);
+			$results[$i]['dt'] = date_i18n(wp_slimstat::$options['date_time_format'], $results[$i]['dt'], true);
 			if (!empty($results[$i]['searchterms']) && empty($results[$i]['resource'])){
 				$results[$i]['resource'] = __('Search for','wp-slimstat').': '.htmlentities($results[$i]['searchterms'], ENT_QUOTES, 'UTF-8');
 			}
@@ -735,7 +734,7 @@ class wp_slimstat_reports {
 						if (is_object($display_real_name)) $display_user_name = $display_real_name->display_name;
 					}
 					$host_by_ip = "<a class='slimstat-filter-link highlight-user' href='".self::fs_url('user equals '.$results[$i]['user'])."'>{$display_user_name}</a>";
-					$highlight_row = (strpos( $results[$i]['notes'], '[user]') !== false)?' is-known-user':' is-known-visitor';
+					$highlight_row = (strpos( $results[$i]['notes'], 'user:') !== false)?' is-known-user':' is-known-visitor';
 				}
 				$host_by_ip = "<a class='slimstat-font-location-1 whois' href='".wp_slimstat::$options['ip_lookup_service']."{$results[$i]['ip']}' target='_blank' title='WHOIS: {$results[$i]['ip']}'></a> $host_by_ip";
 				$results[$i]['country'] = "<a class='slimstat-filter-link inline-icon' href='".self::fs_url('country equals '.$results[$i]['country'])."'><img class='slimstat-tooltip-trigger' src='".plugins_url('/images/flags/'.$results[$i]['country'].'.png', dirname(__FILE__))."' width='16' height='16'/><span class='slimstat-tooltip-content'>".__('c-'.$results[$i]['country'],'wp-slimstat').'</span></a>';
@@ -1069,13 +1068,13 @@ class wp_slimstat_reports {
 			$your_content['comments'] = $GLOBALS['wpdb']->get_var("SELECT COUNT(*) FROM {$GLOBALS['wpdb']->comments}");
 			$your_content['pingbacks'] = $GLOBALS['wpdb']->get_var("SELECT COUNT(*) FROM {$GLOBALS['wpdb']->comments} WHERE comment_type = 'pingback'");
 			$your_content['trackbacks'] = $GLOBALS['wpdb']->get_var("SELECT COUNT(*) FROM {$GLOBALS['wpdb']->comments} WHERE comment_type = 'trackback'");
-			$your_content['longest_post_id'] = $GLOBALS['wpdb']->get_var("SELECT ID FROM {$GLOBALS['wpdb']->posts} WHERE post_status = 'publish' AND post_type = 'post' ORDER BY LENGTH(post_content) DESC LIMIT 0,1");
 			$your_content['oldest_post_timestamp'] = $GLOBALS['wpdb']->get_var("SELECT UNIX_TIMESTAMP(post_date) FROM {$GLOBALS['wpdb']->posts} WHERE post_status = 'publish' AND post_type = 'post' ORDER BY post_date ASC LIMIT 0,1");
-			$your_content['longest_comment_id'] = $GLOBALS['wpdb']->get_var("SELECT comment_ID FROM {$GLOBALS['wpdb']->comments} ORDER BY LENGTH(comment_content) DESC LIMIT 0,1");
 			$your_content['avg_comments_per_post'] = !empty($your_content['posts'])?$your_content['comments']/$your_content['posts']:0;
-
 			$days_in_interval = floor((date_i18n('U')-$your_content['oldest_post_timestamp'])/86400);
 			$your_content['avg_posts_per_day'] = ($days_in_interval > 0)?$your_content['posts']/$days_in_interval:$your_content['posts'];
+			
+			$your_content['avg_server_latency'] = $GLOBALS['wpdb']->get_var("SELECT AVG(server_latency) FROM {$GLOBALS['wpdb']->prefix}slim_stats WHERE server_latency <> 0");
+			$your_content['avg_page_speed'] = $GLOBALS['wpdb']->get_var("SELECT AVG(page_performance) FROM {$GLOBALS['wpdb']->prefix}slim_stats WHERE page_performance <> 0");
 
 			// Store values as transients for 30 minutes
 			set_transient('slimstat_your_content', $your_content, 1800);
@@ -1088,10 +1087,10 @@ class wp_slimstat_reports {
 		<p><?php _e('Total Comments', 'wp-slimstat') ?> <span><?php echo number_format($your_content['comments'], 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php _e('Pingbacks', 'wp-slimstat') ?> <span><?php echo number_format($your_content['pingbacks'], 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php _e('Trackbacks', 'wp-slimstat') ?> <span><?php echo number_format($your_content['trackbacks'], 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
-		<p><?php _e('Longest Post (ID)', 'wp-slimstat') ?> <span><?php echo '<a href="post.php?action=edit&post='.$your_content['longest_post_id'].'">'.$your_content['longest_post_id'].'</a>' ?></span></p>
-		<p><?php _e('Longest Comment (ID)', 'wp-slimstat') ?> <span><?php echo '<a href="comment.php?action=editcomment&c='.$your_content['longest_comment_id'].'">'.$your_content['longest_comment_id'].'</a>' ?></span></p>
 		<p><?php _e('Avg Comments Per Post', 'wp-slimstat') ?> <span><?php echo number_format($your_content['avg_comments_per_post'], 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
-		<p><?php _e('Avg Posts Per Day', 'wp-slimstat') ?> <span><?php echo number_format($your_content['avg_posts_per_day'], 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p><?php
+		<p><?php _e('Avg Posts Per Day', 'wp-slimstat') ?> <span><?php echo number_format($your_content['avg_posts_per_day'], 2, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
+		<p><?php _e('Avg Server Latency', 'wp-slimstat') ?> <span><?php echo number_format($your_content['avg_server_latency'], 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?> ms</span></p>
+		<p><?php _e('Avg Page Load Time', 'wp-slimstat') ?> <span><?php echo number_format($your_content['avg_page_speed'], 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?> ms</span></p><?php
 	}
 
 	public static function show_report_wrapper($_report_id = 'p0', $_force_return = false){
