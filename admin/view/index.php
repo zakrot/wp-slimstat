@@ -54,12 +54,12 @@
 				}
 			?></a>
 			<span>
-				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date_i18n('d').'&&&month equals '.date_i18n('m').'&&&year equals '.date_i18n('Y').'&&&interval equals 0') ?>"><?php _e('Today','wp-slimstat') ?></a>
-				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date_i18n('d', mktime(0, 0, 0, date_i18n('m'), date_i18n('d')-1, date_i18n('Y'))).'&&&month equals '.date_i18n('m', mktime(0, 0, 0, date_i18n('m'), date_i18n('d')-1, date_i18n('Y'))).'&&&year equals '.date_i18n('Y', mktime(0, 0, 0, date_i18n('m'), date_i18n('d')-1, date_i18n('Y'))).'&&&interval equals 0') ?>"><?php _e('Yesterday','wp-slimstat') ?></a>
-				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date_i18n('d').'&&&month equals '.date_i18n('m').'&&&year equals '.date_i18n('Y').'&&&interval equals -7') ?>"><?php _e('Last 7 Days','wp-slimstat') ?></a>
-				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date_i18n('d').'&&&month equals '.date_i18n('m').'&&&year equals '.date_i18n('Y').'&&&interval equals -60') ?>"><?php _e('Last 60 Days','wp-slimstat') ?></a>
-				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date_i18n('d').'&&&month equals '.date_i18n('m').'&&&year equals '.date_i18n('Y').'&&&interval equals -90') ?>"><?php _e('Last 90 Days','wp-slimstat') ?></a>
-				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals 0&&&month equals 0&&&year equals '.date_i18n('Y').'&&&interval equals 0') ?>"><?php _e('This Year So Far','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date('d').'&&&month equals '.date('m').'&&&year equals '.date('Y').'&&&interval equals 0') ?>"><?php _e('Today','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date('d', mktime(0, 0, 0, date('m'), date('d')-1, date('Y'))).'&&&month equals '.date('m', mktime(0, 0, 0, date('m'), date('d')-1, date('Y'))).'&&&year equals '.date('Y', mktime(0, 0, 0, date('m'), date('d')-1, date('Y'))).'&&&interval equals 0') ?>"><?php _e('Yesterday','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date('d').'&&&month equals '.date('m').'&&&year equals '.date('Y').'&&&interval equals -7') ?>"><?php _e('Last 7 Days','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date('d').'&&&month equals '.date('m').'&&&year equals '.date('Y').'&&&interval equals -60') ?>"><?php _e('Last 60 Days','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals '.date('d').'&&&month equals '.date('m').'&&&year equals '.date('Y').'&&&interval equals -90') ?>"><?php _e('Last 90 Days','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link slimstat-date-choice" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals 0&&&month equals 0&&&year equals '.date('Y').'&&&interval equals 0') ?>"><?php _e('This Year So Far','wp-slimstat') ?></a>
 				<strong><?php _e('Date Range','wp-slimstat') ?></strong>
 				<select name="day" id="slimstat-filter-day" class="empty-on-submit">
 					<option value="0"><?php _e('Day','wp-slimstat') ?></option><?php
@@ -86,7 +86,7 @@
 				<br/>+ <input type="text" name="interval" id="slimstat-filter-interval" class="empty-on-focus empty-on-submit" value="<?php echo !empty(wp_slimstat_db::$filters_normalized['date']['interval'])?wp_slimstat_db::$filters_normalized['date']['interval']:__('days', 'wp-slimstat') ?>">
 				<input type="submit" value="<?php _e('Apply','wp-slimstat') ?>" class="button-secondary">
 				<?php if (!empty(wp_slimstat_db::$filters_normalized['date']['day']) || !empty(wp_slimstat_db::$filters_normalized['date']['month']) || !empty(wp_slimstat_db::$filters_normalized['date']['year'])): ?>
-				<a class="slimstat-filter-link button-secondary" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals 0&&&month equals '.date_i18n('n').'&&&year equals '.date_i18n('Y').'&&&interval equals 0') ?>"><?php _e('Reset Filters','wp-slimstat') ?></a>
+				<a class="slimstat-filter-link button-secondary" href="<?php echo wp_slimstat_reports::fs_url('hour equals 0&&&day equals 0&&&month equals '.date('n').'&&&year equals '.date('Y').'&&&interval equals 0') ?>"><?php _e('Reset Filters','wp-slimstat') ?></a>
 				<?php endif ?>
 			</span>
 		</fieldset><!-- .slimstat-date-filters -->

@@ -567,8 +567,8 @@ class wp_slimstat_reports {
 	public static function show_chart($_id = 'p0', $_chart_data = array(), $_chart_labels = array()){
 		/* $rtl_filler_current = $rtl_filler_previous = 0;
 		if ($GLOBALS['wp_locale']->text_direction == 'rtl' && !wp_slimstat_db::$filters_normalized['selected']['day']){
-			$rtl_filler_current = 31-((date_i18n('Ym') == wp_slimstat_db::$filters_normalized['date']['year'].wp_slimstat_db::$filters_normalized['date']['month'])?wp_slimstat_db::$filters_normalized['date']['day']:cal_days_in_month(CAL_GREGORIAN, wp_slimstat_db::$filters_normalized['date']['month'], wp_slimstat_db::$filters_normalized['date']['year']));
-			$rtl_filler_previous = 31-cal_days_in_month(CAL_GREGORIAN, date_i18n('m', self::$filters_normalized['utime']['previous_start']), date_i18n('Y', self::$filters_normalized['utime']['previous_start']));
+			$rtl_filler_current = 31-((date('Ym') == wp_slimstat_db::$filters_normalized['date']['year'].wp_slimstat_db::$filters_normalized['date']['month'])?wp_slimstat_db::$filters_normalized['date']['day']:cal_days_in_month(CAL_GREGORIAN, wp_slimstat_db::$filters_normalized['date']['month'], wp_slimstat_db::$filters_normalized['date']['year']));
+			$rtl_filler_previous = 31-cal_days_in_month(CAL_GREGORIAN, date('m', self::$filters_normalized['utime']['previous_start']), date('Y', self::$filters_normalized['utime']['previous_start']));
 		} */ ?>
 		<div id="chart-placeholder"></div><div id="chart-legend"></div>
 
@@ -777,8 +777,8 @@ class wp_slimstat_reports {
 		<p><?php _e('Javascript Mode', 'wp-slimstat') ?> <span><?php _e(ucfirst(wp_slimstat::$options['javascript_mode']), 'wp-slimstat') ?></span></p>
 		<p><?php _e('Tracking Browser Caps', 'wp-slimstat') ?> <span><?php _e(ucfirst(wp_slimstat::$options['enable_javascript']), 'wp-slimstat') ?></span></p>
 		<p><?php _e('Auto purge', 'wp-slimstat') ?> <span><?php echo (wp_slimstat::$options['auto_purge'] > 0)?wp_slimstat::$options['auto_purge'].' '.__('days','wp-slimstat'):__('No','wp-slimstat') ?></span></p>
-		<p><?php _e('Oldest pageview', 'wp-slimstat') ?> <span><?php $dt = wp_slimstat_db::get_oldest_visit('1=1', false); echo ($dt == null)?__('No visits','wp-slimstat'):date_i18n(get_option('date_format'), $dt) ?></span></p>
-		<p>Geo IP <span><?php echo date_i18n(get_option('date_format'), @filemtime(WP_PLUGIN_DIR.'/wp-slimstat/databases/maxmind.dat')) ?></span></p><?php
+		<p><?php _e('Oldest pageview', 'wp-slimstat') ?> <span><?php $dt = wp_slimstat_db::get_oldest_visit('1=1', false); echo ($dt == null)?__('No visits','wp-slimstat'):date(get_option('date_format'), $dt) ?></span></p>
+		<p>Geo IP <span><?php echo date(get_option('date_format'), @filemtime(WP_PLUGIN_DIR.'/wp-slimstat/databases/maxmind.dat')) ?></span></p><?php
 	}
 
 	public static function show_overview_summary($_id = 'p0', $_current_pageviews = 0, $_chart_data = array()){
@@ -795,10 +795,10 @@ class wp_slimstat_reports {
 			_e('From Search Results', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.searchterms <> ""'), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
 		<p><?php self::inline_help(__('Used to differentiate between multiple requests to download a file from one internet address (IP) and requests originating from many distinct addresses','wp-slimstat'));
 			_e('Unique IPs', 'wp-slimstat'); ?> <span><?php echo number_format(wp_slimstat_db::count_records('1=1', 't1.ip'), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
-		<p><?php _e('Last 5 minutes', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt > '.(date_i18n('U')-300), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
-		<p><?php _e('Last 30 minutes', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt > '.(date_i18n('U')-1800), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
-		<p><?php _e('Today', 'wp-slimstat'); ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt > '.(date_i18n('U', mktime(0, 0, 0, date_i18n('m'), date_i18n('d'), date_i18n('Y')))), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
-		<p><?php _e('Yesterday', 'wp-slimstat'); ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt BETWEEN '.(date_i18n('U', mktime(0, 0, 0, date_i18n('m'), date_i18n('d')-1, date_i18n('Y')))).' AND '.(date_i18n('U', mktime(23, 59, 59, date_i18n('m'), date_i18n('d')-1, date_i18n('Y')))), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p><?php
+		<p><?php _e('Last 5 minutes', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt > '.(date('U')-300), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
+		<p><?php _e('Last 30 minutes', 'wp-slimstat') ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt > '.(date('U')-1800), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
+		<p><?php _e('Today', 'wp-slimstat'); ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt > '.(date('U', mktime(0, 0, 0, date('m'), date('d'), date('Y')))), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p>
+		<p><?php _e('Yesterday', 'wp-slimstat'); ?> <span><?php echo number_format(wp_slimstat_db::count_records('t1.dt BETWEEN '.(date('U', mktime(0, 0, 0, date('m'), date('d')-1, date('Y')))).' AND '.(date('U', mktime(23, 59, 59, date('m'), date('d')-1, date('Y')))), '*', true, false), 0, wp_slimstat_db::$formats['decimal'], wp_slimstat_db::$formats['thousand']) ?></span></p><?php
 	}
 	
 	public static function show_visitors_summary($_id = 'p0', $_total_human_hits = 0, $_total_human_visits = 0){
@@ -1070,7 +1070,7 @@ class wp_slimstat_reports {
 			$your_content['trackbacks'] = $GLOBALS['wpdb']->get_var("SELECT COUNT(*) FROM {$GLOBALS['wpdb']->comments} WHERE comment_type = 'trackback'");
 			$your_content['oldest_post_timestamp'] = $GLOBALS['wpdb']->get_var("SELECT UNIX_TIMESTAMP(post_date) FROM {$GLOBALS['wpdb']->posts} WHERE post_status = 'publish' AND post_type = 'post' ORDER BY post_date ASC LIMIT 0,1");
 			$your_content['avg_comments_per_post'] = !empty($your_content['posts'])?$your_content['comments']/$your_content['posts']:0;
-			$days_in_interval = floor((date_i18n('U')-$your_content['oldest_post_timestamp'])/86400);
+			$days_in_interval = floor((date('U')-$your_content['oldest_post_timestamp'])/86400);
 			$your_content['avg_posts_per_day'] = ($days_in_interval > 0)?$your_content['posts']/$days_in_interval:$your_content['posts'];
 			
 			$your_content['avg_server_latency'] = $GLOBALS['wpdb']->get_var("SELECT AVG(server_latency) FROM {$GLOBALS['wpdb']->prefix}slim_stats WHERE server_latency <> 0");
@@ -1145,7 +1145,7 @@ class wp_slimstat_reports {
 				self::show_overview_summary($_report_id, $current_pageviews, $chart_data);
 				break;
 			case 'slim_p1_04':
-				self::show_results('recent', $_report_id, 'user', array('custom_where' => 't1.user <> "" AND t1.dt > '.(date_i18n('U')-300), 'use_date_filters' => false));
+				self::show_results('recent', $_report_id, 'user', array('custom_where' => 't1.user <> "" AND t1.dt > '.(date('U')-300), 'use_date_filters' => false));
 				break;
 			case 'slim_p1_05':
 			case 'slim_p3_08':

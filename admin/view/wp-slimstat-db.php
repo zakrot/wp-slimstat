@@ -96,9 +96,9 @@ class wp_slimstat_db {
 					self::$filters_normalized['date']['hour'],
 					0,
 					0,
-					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n'),
-					!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date_i18n('j'),
-					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')
+					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n'),
+					!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date('j'),
+					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')
 				);
 				self::$filters_normalized['utime']['end'] = self::$filters_normalized['utime']['start'] + 3599;
 				self::$filters_normalized['utime']['type'] = 'H';
@@ -108,9 +108,9 @@ class wp_slimstat_db {
 					0,
 					0,
 					0,
-					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n'),
+					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n'),
 					self::$filters_normalized['date']['day'],
-					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')
+					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')
 				);
 				self::$filters_normalized['utime']['end'] = self::$filters_normalized['utime']['start'] + 86399;
 				self::$filters_normalized['utime']['type'] = 'd';
@@ -125,14 +125,14 @@ class wp_slimstat_db {
 					0,
 					0,
 					0,
-					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n'),
+					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n'),
 					1,
-					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')
+					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')
 				);
 
 				self::$filters_normalized['utime']['end'] = strtotime(
-					(!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')).'-'.
-					(!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n')).
+					(!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')).'-'.
+					(!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n')).
 					'-01 00:00 +1 month UTC'
 				)-1;
 				self::$filters_normalized['utime']['type'] = 'm';
@@ -145,39 +145,39 @@ class wp_slimstat_db {
 					0,
 					0,
 					0,
-					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n'),
-					!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date_i18n('j'),
-					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')
+					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n'),
+					!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date('j'),
+					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')
 				);
 				self::$filters_normalized['utime']['end'] = strtotime(
-					(!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')).'-'.
-					(!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n')).'-'.
-					(!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date_i18n('j')).' 00:00:00 +'.
+					(!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')).'-'.
+					(!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n')).'-'.
+					(!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date('j')).' 00:00:00 +'.
 					self::$filters_normalized['date']['interval'].' days UTC'
 				)-1;
 			}
 			else{
 				// Swap boundaries, if interval is negative
 				self::$filters_normalized['utime']['start'] = strtotime(
-					(!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')).'-'.
-					(!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n')).'-'.
-					(!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date_i18n('j')).' 00:00:00 '.
+					(!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')).'-'.
+					(!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n')).'-'.
+					(!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date('j')).' 00:00:00 '.
 					(self::$filters_normalized['date']['interval']+1).' days UTC'
 				);
 				self::$filters_normalized['utime']['end'] = mktime(
 					23,
 					59,
 					59,
-					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n'),
-					!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date_i18n('j'),
-					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y')
+					!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n'),
+					!empty(self::$filters_normalized['date']['day'])?self::$filters_normalized['date']['day']:date('j'),
+					!empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y')
 				);
 			}
 		}
 
 		// If end is in the future, set it to now
-		if (self::$filters_normalized['utime']['end'] > date_i18n('U')){
-			self::$filters_normalized['utime']['end'] = date_i18n('U');
+		if (self::$filters_normalized['utime']['end'] > date('U')){
+			self::$filters_normalized['utime']['end'] = date('U');
 		}
 		
 		// If start is after end, set it to first of month
@@ -186,9 +186,9 @@ class wp_slimstat_db {
 				0,
 				0,
 				0,
-				date_i18n('n', self::$filters_normalized['utime']['end']),
+				date('n', self::$filters_normalized['utime']['end']),
 				1,
-				date_i18n('Y', self::$filters_normalized['utime']['end'])
+				date('Y', self::$filters_normalized['utime']['end'])
 			);
 			self::$filters_normalized['date']['hour'] = self::$filters_normalized['date']['day'] = self::$filters_normalized['date']['month'] = self::$filters_normalized['date']['year'] = 0;
 		}
@@ -542,7 +542,7 @@ class wp_slimstat_db {
 				$values_in_interval = array(abs(self::$filters_normalized['date']['interval']), abs(self::$filters_normalized['date']['interval']), 0);
 				break;
 			default:
-				$previous['start'] = mktime(0, 0, 0, (!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date_i18n('n'))-1, 1, !empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date_i18n('Y'));
+				$previous['start'] = mktime(0, 0, 0, (!empty(self::$filters_normalized['date']['month'])?self::$filters_normalized['date']['month']:date('n'))-1, 1, !empty(self::$filters_normalized['date']['year'])?self::$filters_normalized['date']['year']:date('Y'));
 				$label_date_format = 'm/Y';
 				$group_by = array('MONTH', 'DAY', 'j');
 				$values_in_interval = array(date('t', $previous['start']), date('t', self::$filters_normalized['utime']['start']), 1);
@@ -588,8 +588,8 @@ class wp_slimstat_db {
 		for ($i = $values_in_interval[2]; $i < $values_in_interval[0]; $i++){
 			// Do not include dates in the future
 
-			if ((empty(self::$filters_normalized['date']['interval']) || date('Ymd', wp_slimstat_db::$filters_normalized['utime']['start'] + ( $i * 86400)) > date_i18n('Ymd')) && 
-				(!empty(self::$filters_normalized['date']['interval']) || $i > date_i18n($group_by[2]))){
+			if ((empty(self::$filters_normalized['date']['interval']) || date('Ymd', wp_slimstat_db::$filters_normalized['utime']['start'] + ( $i * 86400)) > date('Ymd')) && 
+				(!empty(self::$filters_normalized['date']['interval']) || $i > date($group_by[2]))){
 				continue;
 			}
 			$output['current']['first_metric'][$i] = 0;
@@ -663,16 +663,16 @@ class wp_slimstat_db {
 							// Try to apply strtotime to value
 							switch($a_filter[1]){
 								case 'hour':
-									$filters_normalized['date'][$a_filter[1]] = date('H', strtotime($a_filter[3], date_i18n('U')));
+									$filters_normalized['date'][$a_filter[1]] = date('H', strtotime($a_filter[3], date('U')));
 									break;
 								case 'day':
-									$filters_normalized['date'][$a_filter[1]] = date('j', strtotime($a_filter[3], date_i18n('U')));
+									$filters_normalized['date'][$a_filter[1]] = date('j', strtotime($a_filter[3], date('U')));
 									break;
 								case 'month':
-									$filters_normalized['date'][$a_filter[1]] = date('n', strtotime($a_filter[3], date_i18n('U')));
+									$filters_normalized['date'][$a_filter[1]] = date('n', strtotime($a_filter[3], date('U')));
 									break;
 								case 'year':
-									$filters_normalized['date'][$a_filter[1]] = date('Y', strtotime($a_filter[3], date_i18n('U')));
+									$filters_normalized['date'][$a_filter[1]] = date('Y', strtotime($a_filter[3], date('U')));
 									break;
 								default:
 									break;

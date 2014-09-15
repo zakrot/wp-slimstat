@@ -187,7 +187,7 @@ class wp_slimstat{
 	 * Core tracking functionality
 	 */
 	public static function slimtrack($_argument = ''){
-		self::$stat['dt'] = date_i18n('U');
+		self::$stat['dt'] = date('U');
 		self::$stat['notes'] = '';
 
 		$referer = array();
@@ -1271,7 +1271,7 @@ class wp_slimstat{
 		if (($autopurge_interval = intval(self::$options['auto_purge'])) <= 0) return;
 
 		// Delete old entries
-		$days_ago = strtotime(date_i18n('Y-m-d H:i:s')." -$autopurge_interval days");
+		$days_ago = strtotime(date('Y-m-d H:i:s')." -$autopurge_interval days");
 		self::$wpdb->query("DELETE ts FROM {$GLOBALS['wpdb']->prefix}slim_stats ts WHERE ts.dt < $days_ago");
 
 		// Optimize table
